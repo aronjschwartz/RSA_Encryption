@@ -19,14 +19,13 @@ class encryption_set():
 		self.q = q
 		self.n = p*q
 		self.totient = (p-1)*(q-1)
-
+		self.e = self.generate_e(self.totient)
 		self.m = 87  #value to encrypt as test
+		self.k = 
 		
-		
-	#'e' must be a value that is: 1. less than n
-	#                             2. coprime with the totient
-	#                             3. Satisfies m^e > n
-	def generate_e(self, totient):   # ADD THE TOTIENT
+	#e must be a value that is: less than n, coprime with the totient, satisfies m^e > n where 'm' is the integer to be transformed
+
+	def generate_e(self, totient):   
 		candidate_found = False
 		while(candidate_found == False):
 			rand_num = random.sample(range(1, self.n), 1)[0]
@@ -35,10 +34,18 @@ class encryption_set():
 				break
 			else:
 				print("BAD CANDIDATE: ", rand_num)
-					
-		
+		return rand_num	
+	
+	
+	def encrypt_int(self):
+		return 1 #placeholder
+	
+	def decrypt_int(self):
+		return 1 #placeholder
+	
 def main():
 	test = encryption_set(17, 23)
-	test.generate_e(test.totient)
-
+	
+	print("The value of e is: ", test.e)
+	
 main()
