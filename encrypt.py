@@ -6,6 +6,7 @@
 from math import gcd as bltin_gcd
 import random
 
+
 def check_coprimality(a, b):
     return bltin_gcd(a, b) == 1
 	
@@ -18,7 +19,7 @@ class encryption_set():
 		self.p = p
 		self.q = q
 		self.n = p*q
-		self.totient = (p-1)*(q-1)
+		self.totient = generate_totient(p, q)
 		self.e = self.generate_e(self.totient)
 		self.m = 87  #value to encrypt as test
 		self.k = 
@@ -36,11 +37,13 @@ class encryption_set():
 				print("BAD CANDIDATE: ", rand_num)
 		return rand_num	
 	
+	def generate_totient(self, p, q):
+		return (p-1)*(q-1)
 	
-	def encrypt_int(self):
+	def encrypt_int(self, val):
 		return 1 #placeholder
 	
-	def decrypt_int(self):
+	def decrypt_int(self, val):
 		return 1 #placeholder
 	
 def main():
