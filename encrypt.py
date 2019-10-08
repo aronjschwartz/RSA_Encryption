@@ -18,7 +18,7 @@ def check_coprimality(a, b):
 class encryption_set():
 	#Need the original primes to initialize the object
 	def __init__(self, p, q):
-		self.m = 10  #TEMPORARY.  HOW ENSURE PARAMETERS SATISFIED IF THIS ALWAYS CHANGING????
+		#self.m = 87  #TEMPORARY.  HOW ENSURE PARAMETERS SATISFIED IF THIS ALWAYS CHANGING????
 		self.p = p
 		self.q = q
 		self.n = p*q
@@ -32,7 +32,7 @@ class encryption_set():
 		candidate_found = False
 		while(candidate_found == False):
 			rand_num = random.sample(range(1, self.n), 1)[0]
-			if ((rand_num < self.n) and (check_coprimality(totient, rand_num)) and ((math.pow(self.m, rand_num) > self.n))):
+			if ((rand_num < self.n) and (check_coprimality(totient, rand_num)) and ((math.pow(127, rand_num) > self.n))): #128 for ascii
 				print("CANDIDATE FOUND: ", rand_num)
 				break
 			else:
@@ -58,7 +58,7 @@ class encryption_set():
 	def to_String(self):
 		print("P: ", self.p)
 		print("Q: ", self.q)
-		print("M: ", self.m)
+		#print("M: ", self.m)
 		print("N: ", self.n)
 		print("T: ", self.totient)
 		print("E: ", self.e)
@@ -84,14 +84,10 @@ def main():
 	RSA_object.to_String()
 	
 	for i in plain_text:
-		#print("Appending to plain text ascii: ", ord(i))
 		plain_text_ascii.append(ord(i))
 		
 	for i in plain_text_ascii:
 		cipher_ascii.append(int(RSA_object.generate_cypher(i)))
-		#print("Generated cypher from ", i, " to ", RSA_object.generate_cypher(i))
-		
-		
 
 	for i in cipher_ascii:
 		cipher_text += chr(i)
