@@ -12,8 +12,6 @@ import mod
 def check_coprimality(a, b):
     return bltin_gcd(a, b) == 1
 	
-	
-	
 #This class accepts 2 prime numbers and generates/stores all associated values to perform the RSA encryption method
 class encryption_set():
 	#Need the original primes to initialize the object
