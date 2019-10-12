@@ -78,7 +78,7 @@ class encryption_set():
 def main():
 	#Create an RSA encryption set object
 	RSA_object = encryption_set(2, 19)
-	plain_text = "Aron is rather cool"
+	plain_text = "!####!"
 	plain_text_ascii = []
 	cipher_ascii = []
 	cipher_text = ""
@@ -93,8 +93,8 @@ def main():
 	plain_text_ascii = get_ascii_list(plain_text)
 
 	for i in plain_text_ascii:
+		print("Encrypting char ", chr(i), " which is ascii ", i)
 		cipher_ascii.append(int(RSA_object.encrypt_int(i)))
-
 	cipher_text = get_string_from_ascii(cipher_ascii)
 	#Test now that decrpyting cipher text results in original plain text
 	for i in cipher_ascii:
@@ -108,15 +108,15 @@ def main():
 	print("\n\nDecrypted cipher text: ", decrypted_cipher_text)
 	
 	#val = 9
-	#test_list = range(2, 37)
-	#for i in test_list:
-	#	print("Encrypting val: ", i, "Result: ", int(RSA_object.encrypt_int(i)))
-	#	encrytped_test_list.append(int(RSA_object.encrypt_int(i)))
-	#print()
-	#count = 0
-	#for i in encrytped_test_list:
-	#	print("Decrytping val: ", i, "Result: ", int(RSA_object.decrypt_int(i)), "Originally: ", test_list[count])
-	#	count +=1
+	test_list = range(2, 37)
+	for i in test_list:
+		print("Encrypting val: ", i, "Result: ", int(RSA_object.encrypt_int(i)))
+		encrytped_test_list.append(int(RSA_object.encrypt_int(i)))
+	print()
+	count = 0
+	for i in encrytped_test_list:
+		print("Decrytping val: ", i, "Result: ", int(RSA_object.decrypt_int(i)), "Originally: ", test_list[count])
+		count +=1
 	
 
 main()
