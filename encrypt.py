@@ -96,7 +96,7 @@ class encryption_set():
 	
 def main():
 	#Sample plain text to encrypt
-	plain_text = "Aron is a very, VERY cool guy!"
+	plain_text = "Encryption is challenging, but very cool!"
 	#Variables to store ascii-lists, plain-text lists, etc
 	plain_text_ascii = []
 	cipher_ascii = []
@@ -107,7 +107,7 @@ def main():
 	decrypted_test_list = []
 	
 	#Create an RSA encryption set object and print out the values it created for itself
-	RSA_object = encryption_set(29, 59)
+	RSA_object = encryption_set(37, 73)
 	RSA_object.to_String()
 	
 	#Obtain a list of ascii values for the plain text
