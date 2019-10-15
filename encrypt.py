@@ -30,11 +30,13 @@ class encryption_set():
 
 	#Need the original primes to initialize the object
 	def __init__(self, p, q):
-		#Assign p, q
+		#Assign p, q, n, and totient
 		self.p = p
 		self.q = q
 		self.n = p*q
 		self.totient = self.generate_totient(p, q)
+		
+		#Generate the public and private keys.  Randomized each time 
 		self.e = self.generate_e()
 		self.d = self.generate_d()
 			
@@ -56,10 +58,10 @@ class encryption_set():
 		possible_d = 1
 		possible_k = 1
 		
-		#Loop until we find a decryption key that will work
+		#Loop until we find a decryption key that will work.  Must satisfy d = (1 + (k)(totient))/e
 		while(1):
 			possible_d = (1 + (possible_k)*(self.totient))/self.e
-			#If the potential decryption-key comes out even, it will work.  Assign appopriately
+			#If the potential decryption-key comes out as a whole integer, it will work as a valid decryption key.  Assign appopriately and break 
 			if (possible_d.is_integer()):
 				print("D candidate found: ", possible_d, " with k value: ", possible_k)
 				valid_d = True
