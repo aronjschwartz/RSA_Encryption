@@ -41,29 +41,38 @@ def run():
 	test_pair = [2, 19]
 	holes_list = []
 	
-	#Reference object stores original p, q, n, t
+	#Reference object to access original p,q,n,t
 	reference_object = encrypt.encryption_set(p=test_pair[0], q=test_pair[1])
+	
 	header = "P=" + str(reference_object.p) + " Q=" + str(reference_object.q) + " N=" + str(reference_object.n) + " T=" + str(reference_object.totient)
+	
 	#First obtain a list of all possible public keys for the object undergoing test
 	valid_e_list = reference_object.valid_e_list
-
-
-	#Loop through all potential public keys
-	#For each public key, find all possible d/k combos that work for that key
-	#For each valid d/k combo found, check how many holes there are from 2 to n-2
 	
+	#Welcome message and print out the p,q,n, t that we are about to analyze
 	print("********* Analyzing data ***********")
 	print(reference_object.print_p_q_n_t())
 	
+	
+	#Loop through all potential public keys
+	#For each public key, find all possible d/k combos that work for that key, and see how many holes the septuple has
 	for public_key in valid_e_list:
 		combos = []
-		combos = temp_object.generate_all_d_k_combinations(public_key)
+		holes_in_pair = 0
+		
+		#Create an encryption object with the current public key being checked
 		temp_object = encrypt.encryption_set(p=test_pair[0], q=test_pair[1], custom_e=public_key)
-
+		
+		#Get all the d/k combos that could work with the public key being checked
+		combos = temp_object.generate_all_d_k_combinations(public_key)
+	
 		print("\nTesting key: ", public_key)
-		print("\tValid d/k combos: ", end='')
 		for pair in combos:
-			print(pair, end=" ")
+			
+			temp_object_two = encrypt.encryption_set(p=test_pair[0], q=test_pair[1], custom_e=public_key, custom_d = pair[0], custom_k = pair[1])
+			holes_in_pair = search_septuple(temp_object_two)
+			print("Pair ", pair, " has ", len(holes_in_pair), " holes")
+
 		
 	
 	
