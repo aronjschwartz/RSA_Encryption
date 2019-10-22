@@ -15,19 +15,39 @@ def check_coprimality(a, b):
 class encryption_set():
 
 	#Need the original primes to initialize the object
-	def __init__(self, p, q):
+	def __init__(self, p, q, custom_e=None, custom_d=None, custom_k =None):
 		#Assign p, q, n, and totient
 		self.p = p
 		self.q = q
 		self.n = p*q
 		self.totient = self.generate_totient(p, q)
 		
-		#Generate the public and private keys.  Randomized each time 
-		self.e = self.generate_e()
-		self.d = self.generate_d()
+		self.valid_e_list =[]
+		self.generate_all_possible_e()
+		
+		#Make randomly valid keys if none are passed in, otherwise set the the specified value
+		if (custom_e == None):
+			self.e = self.generate_random_valid_e()
+		else:
+			self.e = custom_e
+		if (custom_d == None):
+			self.d = self.generate_random_valid_d()
+		else:
+			self.d = custom_d
 			
+		#Set the k if a custom one is passed, otherwise it will be generated when we create a valid d
+		if custom_k != None:
+			self.k = custom_k
+	
+
+	def generate_all_possible_e(self):
+		for i in range(2, self.n):
+			if (check_coprimality(self.totient, i)):
+				self.valid_e_list.append(i)
+
+	
 	#Function to generate a valid public key (encryption key)
-	def generate_e(self):   
+	def generate_random_valid_e(self):   
 		candidate_found = False
 		while(candidate_found == False):
 			#Generate a random number from 2 to n -1
@@ -40,7 +60,7 @@ class encryption_set():
 		return rand_num	
 	
 	#Function to generate a valid private key (decryption key)
-	def generate_d(self):
+	def generate_random_valid_d(self):
 		possible_d = 1
 		possible_k = 1
 		
