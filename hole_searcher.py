@@ -38,7 +38,11 @@ def search_septuple(rsa_object):
 	return holes
 	
 def run():
-	test_pair = [2, 19]
+	
+	
+	#EVEN N IS NOT GOOD!  ANY EVEN N HAS 1 prime factor = 2! This pair caused 3 holes....but I know why now
+	three_holes_pair = [2,19]
+	test_pair = [3,19]
 	holes_list = []
 	
 	#Reference object to access original p,q,n,t
@@ -66,12 +70,12 @@ def run():
 		#Get all the d/k combos that could work with the public key being checked
 		combos = temp_object.generate_all_d_k_combinations(public_key)
 	
-		print("\nTesting key: ", public_key)
+		print("\nTesting public key: ", public_key)
 		for pair in combos:
 			
 			temp_object_two = encrypt.encryption_set(p=test_pair[0], q=test_pair[1], custom_e=public_key, custom_d = pair[0], custom_k = pair[1])
 			holes_in_pair = search_septuple(temp_object_two)
-			print("Pair ", pair, " has ", len(holes_in_pair), " holes")
+			print("Pair d=", pair[0], " k=", pair[1], " has ", len(holes_in_pair), " holes")
 
 		
 	
