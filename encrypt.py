@@ -24,6 +24,9 @@ class encryption_set():
 		
 		self.valid_e_list =[]
 		self.generate_all_possible_e()
+
+		
+		
 		
 		#Make randomly valid keys if none are passed in, otherwise set the the specified value
 		if (custom_e == None):
@@ -44,7 +47,22 @@ class encryption_set():
 		for i in range(2, self.n):
 			if (check_coprimality(self.totient, i)):
 				self.valid_e_list.append(i)
-
+	
+	def generate_all_d_k_combinations(self, temp_e):
+		
+		dk_list = []		
+		possible_d = 1
+		#Check all 'k' values from 2 to n.  Extract all valid k/d combinations
+		for possible_k in range(2, self.n):
+			possible_d = (1 + (possible_k)*(self.totient))/temp_e
+			#If the potential decryption-key comes out as a whole integer, it will work as a valid decryption key
+			if (possible_d.is_integer()):
+				dk_list.append([int(possible_d), int(possible_k)])
+				
+			possible_k +=1
+				
+				
+		return dk_list
 	
 	#Function to generate a valid public key (encryption key)
 	def generate_random_valid_e(self):   
@@ -69,7 +87,6 @@ class encryption_set():
 			possible_d = (1 + (possible_k)*(self.totient))/self.e
 			#If the potential decryption-key comes out as a whole integer, it will work as a valid decryption key.  Assign appopriately and break 
 			if (possible_d.is_integer()):
-				print("D candidate found: ", possible_d, " with k value: ", possible_k)
 				valid_d = True
 				self.k = possible_k
 				break
@@ -101,4 +118,11 @@ class encryption_set():
 		print("D: ", self.d)
 		print("K: ", self.k)
 	
+	def print_p_q_n_t(self):
+		print("P: ", self.p)
+		print("Q: ", self.q)
+		print("N: ", self.n)
+		print("T: ", self.totient)
 	
+	def to_list(self):
+		return [self.p, self.q, self.n, self.totient, self.e, self.d, self.k]
