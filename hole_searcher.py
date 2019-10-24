@@ -39,12 +39,16 @@ def search_septuple(rsa_object):
 def run():
 	
 	
-	#EVEN N IS NOT GOOD!  ANY EVEN N HAS 1 prime factor = 2! This pair caused 3 holes....but I know why now
+	#Even N have only 3 holes, but trivial factoring.  Not useful
 	three_holes_pair = [2,19]
+	#Standard test pair
 	test_pair = [3,19]
+	#A bigger pair, takes a while to finish
 	huge_pair = [101 , 127]
+	#Absolutly massive pair.  More computation needed to analyze.  Conda? Fast math libraries for modular/exponents? Other?
 	massive_pair  = [3203, 3331]
-	holes_list = []
+	
+	#These are the common public keys that are commonly used
 	public_keys = [3, 5, 17, 257, 65537]
 	
 	
@@ -52,12 +56,13 @@ def run():
 	#active_pair = three_holes_pair
 	#active_pair = huge_pair
 	active_pair = massive_pair
-	
+	holes_list = []
 	
 	
 	#Reference object to access original p,q,n,t
 	reference_object = encrypt.encryption_set(p=active_pair[0], q=active_pair[1])
 	
+	#Header for the output file
 	header = "P=" + str(reference_object.p) + " Q=" + str(reference_object.q) + " N=" + str(reference_object.n) + " T=" + str(reference_object.totient)
 	
 	#First obtain a list of all possible public keys for the object undergoing test
