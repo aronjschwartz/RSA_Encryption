@@ -9,7 +9,6 @@ import encrypt
 import csv
 
 
-public_keys = [3, 5, 17, 257, 65537]
 
 def analyze_holes(list):
 	print("Holes found: ", len(list))
@@ -43,29 +42,41 @@ def run():
 	#EVEN N IS NOT GOOD!  ANY EVEN N HAS 1 prime factor = 2! This pair caused 3 holes....but I know why now
 	three_holes_pair = [2,19]
 	test_pair = [3,19]
+	huge_pair = [101 , 127]
+	massive_pair  = [3203, 3331]
 	holes_list = []
+	public_keys = [3, 5, 17, 257, 65537]
+	
+	
+	#active_pair = test_pair
+	#active_pair = three_holes_pair
+	#active_pair = huge_pair
+	active_pair = massive_pair
+	
+	
 	
 	#Reference object to access original p,q,n,t
-	reference_object = encrypt.encryption_set(p=test_pair[0], q=test_pair[1])
+	reference_object = encrypt.encryption_set(p=active_pair[0], q=active_pair[1])
 	
 	header = "P=" + str(reference_object.p) + " Q=" + str(reference_object.q) + " N=" + str(reference_object.n) + " T=" + str(reference_object.totient)
 	
 	#First obtain a list of all possible public keys for the object undergoing test
 	valid_e_list = reference_object.valid_e_list
-	
 	#Welcome message and print out the p,q,n, t that we are about to analyze
 	print("********* Analyzing data ***********")
 	print(reference_object.print_p_q_n_t())
+	print("\nThis object has ", len(valid_e_list)," valid public keys\n")
+	
+	
 	
 	
 	#Loop through all potential public keys
-	#For each public key, find all possible d/k combos that work for that key, and see how many holes the septuple has
 	for public_key in valid_e_list:
 		combos = []
 		holes_in_pair = 0
 		
 		#Create an encryption object with the current public key being checked
-		temp_object = encrypt.encryption_set(p=test_pair[0], q=test_pair[1], custom_e=public_key)
+		temp_object = encrypt.encryption_set(p=active_pair[0], q=active_pair[1], custom_e=public_key)
 		
 		#Get all the d/k combos that could work with the public key being checked
 		combos = temp_object.generate_all_d_k_combinations(public_key)
@@ -73,10 +84,12 @@ def run():
 		print("\nTesting public key: ", public_key)
 		for pair in combos:
 			
-			temp_object_two = encrypt.encryption_set(p=test_pair[0], q=test_pair[1], custom_e=public_key, custom_d = pair[0], custom_k = pair[1])
+			temp_object_two = encrypt.encryption_set(p=active_pair[0], q=active_pair[1], custom_e=public_key, custom_d = pair[0], custom_k = pair[1])
 			holes_in_pair = search_septuple(temp_object_two)
 			print("Pair d=", pair[0], " k=", pair[1], " has ", len(holes_in_pair), " holes")
-
+			#break THIS BREAK STATEMENT WILL CAUSE STOP AFTER EACH PUBLIC key
+			#Public keys ALWAYS have the same number of holes regardless of d/k.  Interesting
+			#Mathematical relations? How do hole numbers relate to public keys? There are answers in the math
 		
 	
 	
