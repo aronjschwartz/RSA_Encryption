@@ -34,6 +34,7 @@ def search_septuple(rsa_object):
 	for index, val in enumerate(integer_list):
 		if integer_list[index] == encrypted_integers[index]:
 			holes.append(val)
+	#Return a list of all holes found for the given septuple
 	return holes
 	
 def run():
@@ -42,20 +43,20 @@ def run():
 	#Even N have only 3 holes, but trivial factoring.  Not useful
 	three_holes_pair = [2,19]
 	#Standard test pair
-	test_pair = [3,19]
+	test_pair = [47,59]
 	#A bigger pair, takes a while to finish
 	huge_pair = [101 , 127]
+	huge_pair_1 = [71, 89]
 	#Absolutly massive pair.  More computation needed to analyze.  Conda? Fast math libraries for modular/exponents? Other?
 	massive_pair  = [3203, 3331]
 	
 	#These are the common public keys that are commonly used
 	public_keys = [3, 5, 17, 257, 65537]
 	
-	
 	#active_pair = test_pair
 	#active_pair = three_holes_pair
 	#active_pair = huge_pair
-	active_pair = massive_pair
+	active_pair = huge_pair
 	holes_list = []
 	
 	
@@ -92,12 +93,14 @@ def run():
 			temp_object_two = encrypt.encryption_set(p=active_pair[0], q=active_pair[1], custom_e=public_key, custom_d = pair[0], custom_k = pair[1])
 			holes_in_pair = search_septuple(temp_object_two)
 			print("Pair d=", pair[0], " k=", pair[1], " has ", len(holes_in_pair), " holes")
-			#break THIS BREAK STATEMENT WILL CAUSE STOP AFTER EACH PUBLIC key
+			break #THIS BREAK STATEMENT WILL CAUSE STOP AFTER EACH PUBLIC key
 			#Public keys ALWAYS have the same number of holes regardless of d/k.  Interesting
 			#Mathematical relations? How do hole numbers relate to public keys? There are answers in the math
 		
-	
-	
+	#temp_object = encrypt.encryption_set(p=active_pair[0], q=active_pair[1], custom_e=17, custom_d=157, custom_k=1)
+	#holes_in_pair = search_septuple(temp_object)
+	#print("Found ", len(holes_in_pair), " holes")
+	#print(holes_in_pair)
 	
 	with open('csvfile.csv','w') as file:
 		file.write(header)

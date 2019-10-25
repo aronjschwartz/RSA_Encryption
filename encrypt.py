@@ -6,7 +6,7 @@
 from math import gcd as bltin_gcd
 import random
 import math
-
+import time
 #Simple function to check for co-primality 
 def check_coprimality(a, b):
     return bltin_gcd(a, b) == 1
@@ -84,9 +84,14 @@ class encryption_set():
 		
 		#Loop until we find a decryption key that will work.  Must satisfy d = (1 + (k)(totient))/e
 		while(1):
+			
 			possible_d = (1 + (possible_k)*(self.totient))/self.e
+			print("Possible d: ", possible_d)
+			print(self.p, self.q, self.n, self.totient)
+			time.sleep(1)
 			#If the potential decryption-key comes out as a whole integer, it will work as a valid decryption key.  Assign appopriately and break 
 			if (possible_d.is_integer()):
+				print("VALID")
 				valid_d = True
 				self.k = possible_k
 				break
@@ -123,6 +128,10 @@ class encryption_set():
 		print("Q: ", self.q)
 		print("N: ", self.n)
 		print("T: ", self.totient)
+	
+	
+	def get_septuple(self):
+		return [self.p, self.q, self.n, self.totient, self.e, self.k, self.d]
 	
 	def to_list(self):
 		return [self.p, self.q, self.n, self.totient, self.e, self.d, self.k]
