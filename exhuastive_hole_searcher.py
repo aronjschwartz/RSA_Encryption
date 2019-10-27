@@ -41,6 +41,7 @@ def run():
 	q_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 	e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
 	
+	#Loop through all p/q combinations trying each e-value for all combinations
 	for p_val in p_list:
 		for q_val in q_list:
 			for e_val in e_list:
@@ -48,8 +49,10 @@ def run():
 				#Ignore repeat cases and cases where p==q
 				if q_val > p_val:
 					try:
+						#Make a temp object for the current septuple
 						temp_object = encrypt.encryption_set(p=p_val, q=q_val, custom_e=e_val)
 						sept = temp_object.get_septuple();
+						#Analyze the holes in the septuple
 						holes_list = search_septuple(temp_object)
 						holes_num = len(holes_list)
 						left_holes = []
@@ -61,6 +64,7 @@ def run():
 								right_holes.append(val)
 						print("Analyzing sept: ", sept)
 						
+						#Append to the output file 
 						with open("holes.csv", "a", newline='') as csv_file:
 							writer = csv.writer(csv_file,  dialect='excel')
 							csv_entry = [sept, holes_num, left_holes, right_holes]
