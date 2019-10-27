@@ -82,7 +82,7 @@ class encryption_set():
 		possible_k = 1
 		
 		#Loop until we find a decryption key that will work.  Must satisfy d = (1 + (k)(totient))/e
-		while(1):		
+		while(1):
 			possible_d = (1 + (possible_k)*(self.totient))/self.e
 			#If the potential decryption-key comes out as a whole integer, it will work as a valid decryption key.  Assign appopriately and break 
 			if (possible_d.is_integer()):		
@@ -92,6 +92,12 @@ class encryption_set():
 			else:
 				#Otherwise increase the value of the k-constant and check again
 				possible_k +=1
+				
+			#Catch infinite loop 
+			if (possible_d > self.n):
+				self.d = 1
+				self.k = 1
+				break
 		#Return the key
 		return int(possible_d)
 	

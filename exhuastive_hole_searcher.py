@@ -27,61 +27,48 @@ def search_septuple(rsa_object):
 	#Return a list of all holes found for the given septuple
 	return holes
 	
+
 	
 def run():
-	
 	
 	header = ["p, q, n, Phi, e, k d","# holes", "Left Holes","Right Holes"]
 	with open("holes.csv", "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
 		writer.writerow(header)
-
-            
+         
 	#List of the first few primes 
-	p_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
-	q_list = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73]
-	e_list_1 = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
-	e_list_2 =  [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
-	p_index = 0
-	q_index = 0
-	e_index = 0
+	p_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+	q_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+	e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
 	
-	
-	
-	
-	active_e_list = []
 	for p_val in p_list:
 		for q_val in q_list:
+			for e_val in e_list:
 			
-			e_index = 0
-			if (active_e_list == e_list_1):
-				print("LIST IS 1, BECOMING 2")
-				active_e_list = e_list_2
-			elif (active_e_list == e_list_2):
-				print("LIST IS 2, BECOMING 1")
-				active_e_list = e_list_1
-			else:
-				active_e_list = e_list_1
-			#Check all the public keys for each p/q combination
-			reference_object = encrypt.encryption_set(p=p_val, q=q_list[q_index])
-			reference_object.generate_all_possible_e()
-			#e_list = reference_object.valid_e_list
-			
-			while(1):
-				temp_object = encrypt.encryption_set(p=p_list[p_index], q=q_list[q_index], custom_e=active_e_list[e_index])
-				sept = temp_object.get_septuple();
-				holes_list = search_septuple(temp_object)
-				holes_num = len(holes_list)
-				
-				#csv_entry = [
-				print(sept, " holes = ", holes_list)
-				
-				
-				
-				e_index +=1
-				if (e_index == (len(active_e_list) - 1)):
-					break
-		q_index +=1
+				#Ignore repeat cases and cases where p==q
+				if q_val > p_val:
+					try:
+						temp_object = encrypt.encryption_set(p=p_val, q=q_val, custom_e=e_val)
+						sept = temp_object.get_septuple();
+						holes_list = search_septuple(temp_object)
+						holes_num = len(holes_list)
+						left_holes = []
+						right_holes = []
+						for index, val in enumerate(holes_list):
+							if (index < (len(holes_list)/2)):
+								left_holes.append(val)
+							else:
+								right_holes.append(val)
+						print("Analyzing sept: ", sept)
+						
+						with open("holes.csv", "a", newline='') as csv_file:
+							writer = csv.writer(csv_file,  dialect='excel')
+							csv_entry = [sept, holes_num, left_holes, right_holes]
+							writer.writerow(csv_entry)
+					
+					except Exception as e: 
+						print("Exception occured: ", str(e))
+								
 run()	
 	
 	
