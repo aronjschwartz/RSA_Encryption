@@ -23,7 +23,7 @@ class encryption_set():
 		self.totient = self.generate_totient(p, q)
 		
 		self.valid_e_list =[]
-			
+		self.debug = False
 		
 		
 		#Make randomly valid keys if none are passed in, otherwise set the the specified value
@@ -42,6 +42,8 @@ class encryption_set():
 	
 
 	def generate_all_possible_e(self):
+		if (self.debug):
+			print("Generating all possible e-values")
 		for i in range(2, self.n):
 			if (check_coprimality(self.totient, i)):
 				self.valid_e_list.append(i)
@@ -51,6 +53,8 @@ class encryption_set():
 		
 		dk_list = []		
 		possible_d = 1
+		if (self.debug):
+			print("Generating all possible d/k combinations")
 		#Check all 'k' values from 2 to n.  Extract all valid k/d combinations
 		for possible_k in range(2, self.n):
 			possible_d = (1 + (possible_k)*(self.totient))/temp_e
@@ -74,13 +78,16 @@ class encryption_set():
 				break
 			else:
 				continue
+		if (self.debug):
+			print("Generated e: ", str(rand_num))
 		return rand_num	
 	
 	#Function to generate a valid private key (decryption key)
 	def generate_random_valid_d(self):
 		possible_d = 1
 		possible_k = 1
-		
+		if (self.debug):
+			print("Generating valid value for d")
 		#Loop until we find a decryption key that will work.  Must satisfy d = (1 + (k)(totient))/e
 		while(1):
 			possible_d = (1 + (possible_k)*(self.totient))/self.e
@@ -99,6 +106,8 @@ class encryption_set():
 				self.k = 1
 				break
 		#Return the key
+		if (self.debug):
+			print("Generated d value: ", int(possible_d))
 		return int(possible_d)
 	
 	#Return the totient defined as (p-1)*(q-1)
@@ -107,10 +116,14 @@ class encryption_set():
 		
 	#Function to encrypt an int and return the cipher-value
 	def encrypt_int(self, val):
+		#if (self.debug):
+		#	print("Encrypting int: ", val)
 		return (val**self.e) % self.n
 	
 	#Function to decrypt an int and return the plain-value
 	def decrypt_int(self, val):
+		#if (self.debug):
+		#	print("Decrypting int: ", val)
 		return (val**self.d) % self.n
 	
 	#Function to dump out internal variables for the encryption object
@@ -129,6 +142,14 @@ class encryption_set():
 		print("N: ", self.n)
 		print("T: ", self.totient)
 	
+	def enable_debug_mode(self):
+		self.debug = True
+		
+	def disable_debug_mode(self):
+		self.debug = False
+	
+	def get_n(self):
+		return self.n
 	
 	def get_septuple(self):
 		return [self.p, self.q, self.n, self.totient, self.e, self.k, self.d]

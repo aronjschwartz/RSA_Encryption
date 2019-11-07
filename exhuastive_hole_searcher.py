@@ -27,21 +27,56 @@ def search_septuple(rsa_object):
 	#Return a list of all holes found for the given septuple
 	return holes
 	
+def load_primes(file_name):
+	primes = []
+	f = open(file_name, 'r')
+	for line in f:
+		if len(line) > 1:
+			split = line.split(" ")
+			for val in split:
+				if val.isnumeric():
+					primes.append(int(val))
+	return primes
 
+def get_number_primes_to_analyze():
 	
+		#Loop until valid input entered
+		while(1):
+			choice = input("Enter number of primes to check: ")
+			try:
+				if int(choice) > 0:
+					return int(choice)
+				else:
+					print("Positive numbers only")
+					choice = input("Enter number of primes to check:  ")
+			except Exception as e:
+				print("Exception occured: ", str(e))
+				continue
+		return choice
+
 def run():
 	
-	header = ["p, q, n, Phi, e, k d","# holes", "Left Holes","Right Holes"]
-	with open("holes.csv", "w") as csv_file:
+	prime_list = load_primes("primes1.txt")
+	choice = get_number_primes_to_analyze()
+	print("Analyzing the first ", choice, " primes")
+	time.sleep(3)
+	
+	
+	file_name = "./Excel_Data/first_" + str(choice) + "primes_holes.csv"
+	header = ["p, q, n, Phi, e, k, d", "n", "e", "# holes", "Left Holes","Right Holes"]
+	with open(file_name, "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
 		writer.writerow(header)
-         
-	#List of the first few primes 
-	p_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
-	q_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+    
+	
+
+	p_list = prime_list[0:choice+1]
+	q_list = prime_list[0:choice+1]
+			  
 	e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
 	
 	#Loop through all p/q combinations trying each e-value for all combinations
+	start_time = time.time()
 	for p_val in p_list:
 		for q_val in q_list:
 			for e_val in e_list:
@@ -51,7 +86,9 @@ def run():
 					try:
 						#Make a temp object for the current septuple
 						temp_object = encrypt.encryption_set(p=p_val, q=q_val, custom_e=e_val)
+					#	temp_object.enable_debug_mode()
 						sept = temp_object.get_septuple();
+						
 						#Analyze the holes in the septuple
 						holes_list = search_septuple(temp_object)
 						holes_num = len(holes_list)
@@ -65,14 +102,32 @@ def run():
 						print("Analyzing sept: ", sept)
 						
 						#Append to the output file 
-						with open("holes.csv", "a", newline='') as csv_file:
+						with open(file_name, "a", newline='') as csv_file:
 							writer = csv.writer(csv_file,  dialect='excel')
-							csv_entry = [sept, holes_num, left_holes, right_holes]
+							csv_entry = [sept,temp_object.get_n(), e_val, holes_num, left_holes, right_holes]
 							writer.writerow(csv_entry)
 					
 					except Exception as e: 
 						print("Exception occured: ", str(e))
-								
+	end_time = time.time()
+	elapsed_time = end_time - start_time
+	
+	start_time_readable = time.ctime(int(start_time))
+	end_time_readable = time.ctime(int(end_time))
+	
+	elapsed_time_minutes = round(float(elapsed_time)/60.0, 2)
+	mins_string = str(elapsed_time_minutes) + " minutes"
+	print("Start time: ", start_time_readable)
+	print("End time: ", end_time_readable)
+	print("Program duration: ", mins_string)
+	
+	time_header = ["Start Time", "End Time", "Elapsed time"]
+	with open(file_name, "a", newline='') as csv_file:
+		writer = csv.writer(csv_file,  dialect='excel')
+		csv_entry = [start_time_readable, end_time_readable, mins_string]
+		writer.writerow("")
+		writer.writerow(time_header)
+		writer.writerow(csv_entry)
 run()	
 	
 	
