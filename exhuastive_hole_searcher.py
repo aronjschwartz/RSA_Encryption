@@ -8,7 +8,6 @@ import csv
 
 #Function takes a RSA object and returns a list of all holes from 2 to n-2
 def search_septuple(rsa_object):
-	
 	#List to hold the holes
 	holes = []
 	#Generate the plaintext list of integers
@@ -38,6 +37,36 @@ def load_primes(file_name):
 					primes.append(int(val))
 	return primes
 
+def get_start_prime():
+	#Loop until valid input entered
+		while(1):
+			choice = input("Enter start prime: ")
+			try:
+				if int(choice) > 0:
+					return int(choice)
+				else:
+					print("Positive numbers only")
+					choice = input("Enter start prime:  ")
+			except Exception as e:
+				print("Exception occured: ", str(e))
+				continue
+		return choice
+		
+def get_end_prime():
+	#Loop until valid input entered
+		while(1):
+			choice = input("Enter end prime: ")
+			try:
+				if int(choice) > 0:
+					return int(choice)
+				else:
+					print("Positive numbers only")
+					choice = input("Enter end prime:  ")
+			except Exception as e:
+				print("Exception occured: ", str(e))
+				continue
+		return choice
+		
 def get_number_primes_to_analyze():
 	
 		#Loop until valid input entered
@@ -57,12 +86,13 @@ def get_number_primes_to_analyze():
 def run():
 	
 	prime_list = load_primes("primes1.txt")
-	choice = get_number_primes_to_analyze()
-	print("Analyzing the first ", choice, " primes")
+	start_choice = get_start_prime()
+	end_choice = get_end_prime()
+	print("Analyzing prime ", start_choice, " to prime ", end_choice, " in first million primes")
 	time.sleep(3)
 	
 	
-	file_name = "./Excel_Data/first_" + str(choice) + "primes_holes.csv"
+	file_name = "./Excel_Data/prime_" + str(start_choice) + "_to_" + str(end_choice) + "_holes.csv"
 	header = ["p, q, n, Phi, e, k, d", "n", "e", "# holes", "Left Holes","Right Holes"]
 	with open(file_name, "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
@@ -70,9 +100,9 @@ def run():
     
 	
 
-	p_list = prime_list[0:choice+1]
-	q_list = prime_list[0:choice+1]
-			  
+	p_list = prime_list[start_choice-1:end_choice+1]
+	q_list = prime_list[start_choice-1:end_choice+1]
+	print("Start val: ", prime_list[start_choice-1], " End val: ", prime_list[end_choice -1])
 	e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
 	
 	#Loop through all p/q combinations trying each e-value for all combinations
@@ -86,7 +116,8 @@ def run():
 					try:
 						#Make a temp object for the current septuple
 						temp_object = encrypt.encryption_set(p=p_val, q=q_val, custom_e=e_val)
-					#	temp_object.enable_debug_mode()
+						#temp_object.enable_debug_mode()
+						#print("DEBUG MODE IS: ", temp_object.debug)
 						sept = temp_object.get_septuple();
 						
 						#Analyze the holes in the septuple

@@ -42,7 +42,7 @@ class encryption_set():
 	
 
 	def generate_all_possible_e(self):
-		if (self.debug):
+		if (self.debug == True):
 			print("Generating all possible e-values")
 		for i in range(2, self.n):
 			if (check_coprimality(self.totient, i)):
@@ -78,7 +78,7 @@ class encryption_set():
 				break
 			else:
 				continue
-		if (self.debug):
+		if (self.debug == True):
 			print("Generated e: ", str(rand_num))
 		return rand_num	
 	
@@ -86,7 +86,7 @@ class encryption_set():
 	def generate_random_valid_d(self):
 		possible_d = 1
 		possible_k = 1
-		if (self.debug):
+		if (self.debug == True):
 			print("Generating valid value for d")
 		#Loop until we find a decryption key that will work.  Must satisfy d = (1 + (k)(totient))/e
 		while(1):
@@ -106,7 +106,7 @@ class encryption_set():
 				self.k = 1
 				break
 		#Return the key
-		if (self.debug):
+		if (self.debug == True):
 			print("Generated d value: ", int(possible_d))
 		return int(possible_d)
 	
@@ -116,15 +116,18 @@ class encryption_set():
 		
 	#Function to encrypt an int and return the cipher-value
 	def encrypt_int(self, val):
-		#if (self.debug):
-		#	print("Encrypting int: ", val)
-		return (val**self.e) % self.n
+		if (self.debug == True):
+			print("Encrypting int: ", val)
+		
+		return pow(val, self.e, self.n)
+		
 	
 	#Function to decrypt an int and return the plain-value
 	def decrypt_int(self, val):
-		#if (self.debug):
-		#	print("Decrypting int: ", val)
-		return (val**self.d) % self.n
+		if (self.debug == True):
+			print("Decrypting int: ", val)
+		return pow(val, self.d, self.n)
+		
 	
 	#Function to dump out internal variables for the encryption object
 	def to_String(self):
