@@ -5,6 +5,7 @@
 import encrypt
 import time
 import csv
+import traceback
 
 #Function takes a RSA object and returns a list of all holes from 2 to n-2
 def search_septuple(rsa_object):
@@ -93,23 +94,23 @@ def run():
 	
 	
 	file_name = "./Excel_Data/prime_" + str(start_choice) + "_to_" + str(end_choice) + "_holes.csv"
-	header = ["p, q, n, Phi, e, k, d", "n", "e", "# holes", "Left Holes","Right Holes"]
+	header = ["p, q, n, Phi, e, k, d", "n", "e", "# holes", "Opacity Percentage"]
 	with open(file_name, "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
 		writer.writerow(header)
     
 	
 
-	p_list = prime_list[start_choice-1:end_choice+1]
-	q_list = prime_list[start_choice-1:end_choice+1]
+	p_list = prime_list[start_choice-1:end_choice-1]
+	q_list = prime_list[start_choice-1:end_choice-1]
 	print("Start val: ", prime_list[start_choice-1], " End val: ", prime_list[end_choice -1])
 	e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
-	
+	pub_keys = [3, 5, 7, 17, 257, 65537]
 	#Loop through all p/q combinations trying each e-value for all combinations
 	start_time = time.time()
 	for p_val in p_list:
 		for q_val in q_list:
-			for e_val in e_list:
+			for e_val in pub_keys:
 			
 				#Ignore repeat cases and cases where p==q
 				if q_val > p_val:
@@ -117,8 +118,11 @@ def run():
 						#Make a temp object for the current septuple
 						temp_object = encrypt.encryption_set(p=p_val, q=q_val, custom_e=e_val)
 						#temp_object.enable_debug_mode()
-						#print("DEBUG MODE IS: ", temp_object.debug)
+					
 						sept = temp_object.get_septuple();
+						
+						
+						
 						
 						#Analyze the holes in the septuple
 						holes_list = search_septuple(temp_object)
@@ -130,16 +134,18 @@ def run():
 								left_holes.append(val)
 							else:
 								right_holes.append(val)
-						print("Analyzing sept: ", sept)
-						
+						transparency = round((float(holes_num)/(temp_object.n -1))*100)
+						opacity = float(100.0 - transparency)
+						print("Analyzing sept: ", sept, " Holes - ", holes_num)
 						#Append to the output file 
 						with open(file_name, "a", newline='') as csv_file:
 							writer = csv.writer(csv_file,  dialect='excel')
-							csv_entry = [sept,temp_object.get_n(), e_val, holes_num, left_holes, right_holes]
+							csv_entry = [sept,temp_object.get_n(), e_val, holes_num, opacity]
 							writer.writerow(csv_entry)
 					
 					except Exception as e: 
 						print("Exception occured: ", str(e))
+						traceback.print_exc()
 	end_time = time.time()
 	elapsed_time = end_time - start_time
 	
