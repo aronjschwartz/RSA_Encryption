@@ -94,7 +94,7 @@ def run():
 	
 	
 	file_name = "./Excel_Data/prime_" + str(start_choice) + "_to_" + str(end_choice) + "_holes.csv"
-	header = ["p, q, n, Phi, e, k, d", "n", "e", "# holes", "Opacity Percentage"]
+	header = ["p, q, n, Phi, e, k, d", "n", "e", "# holes", "Transparency Percentage"]
 	with open(file_name, "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
 		writer.writerow(header)
@@ -135,12 +135,11 @@ def run():
 							else:
 								right_holes.append(val)
 						transparency = round((float(holes_num)/(temp_object.n -1))*100)
-						opacity = float(100.0 - transparency)
 						print("Analyzing sept: ", sept, " Holes - ", holes_num)
 						#Append to the output file 
 						with open(file_name, "a", newline='') as csv_file:
 							writer = csv.writer(csv_file,  dialect='excel')
-							csv_entry = [sept,temp_object.get_n(), e_val, holes_num, opacity]
+							csv_entry = [sept,temp_object.get_n(), e_val, holes_num, transparency]
 							writer.writerow(csv_entry)
 					
 					except Exception as e: 
