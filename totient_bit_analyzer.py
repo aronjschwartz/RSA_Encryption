@@ -94,7 +94,7 @@ def run():
 	
 	
 	file_name = "./Excel_Data/prime_" + str(start_choice) + "_to_" + str(end_choice) + "_totient_patterns.csv"
-	header = ["p, q, n, Phi, e, k, d", "Totient", "Binary Totient", "# holes", "Transparency Percentage"]
+	header = ["p, q, n, Phi, e, k, d", "Totient", "Binary Totient", "# Hot Bits", "Transparency Percentage"]
 	with open(file_name, "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
 		writer.writerow(header)
@@ -139,7 +139,7 @@ def run():
 						#Append to the output file 
 						with open(file_name, "a", newline='') as csv_file:
 							writer = csv.writer(csv_file,  dialect='excel')
-							csv_entry = [sept,temp_object.totient, bin(temp_object.totient), transparency]
+							csv_entry = [sept,temp_object.totient, bin(temp_object.totient), str(bin(temp_object.totient)).count("1"), transparency]
 							writer.writerow(csv_entry)
 					
 					except Exception as e: 
