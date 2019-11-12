@@ -8,23 +8,18 @@ import csv
 import traceback
 
 #Function takes a RSA object and returns a list of all holes from 2 to n-2
+#Function takes a RSA object and returns a list of all holes from 2 to n-2
 def search_septuple(rsa_object):
 	#List to hold the holes
 	holes = []
-	#Generate the plaintext list of integers
-	integer_list = [i for i in range(2, rsa_object.n-1)]
-	#List to hold the encrypted integers
-	encrypted_integers = []
 	
-	#Encrypt all the integers and store them in the encrypted integer list
-	for i in integer_list:
-		encrypted_integers.append(int(rsa_object.encrypt_int(i)))
-	
-	#Loop through the original list and check for all cases where the plaintext=cipher text
-	for index, val in enumerate(integer_list):
-		if integer_list[index] == encrypted_integers[index]:
-			holes.append(val)
-	#Return a list of all holes found for the given septuple
+	count = 2
+	while(1):
+		if ((int(rsa_object.encrypt_int(count))) == count):
+			holes.append(count)
+		count +=1
+		if count == rsa_object.n-1:
+			break
 	return holes
 	
 def load_primes(file_name):
@@ -94,7 +89,7 @@ def run():
 	
 	
 	file_name = "./Excel_Data/prime_" + str(start_choice) + "_to_" + str(end_choice) + "_holes.csv"
-	header = ["p, q, n, Phi, e, k, d", "n", "e", "# holes", "Transparency Percentage"]
+	header = ["p, q, n, Phi, e, k, d", "n", "totient", "e", "# holes", "Transparency Percentage"]
 	with open(file_name, "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
 		writer.writerow(header)
@@ -139,7 +134,7 @@ def run():
 						#Append to the output file 
 						with open(file_name, "a", newline='') as csv_file:
 							writer = csv.writer(csv_file,  dialect='excel')
-							csv_entry = [sept,temp_object.get_n(), e_val, holes_num, transparency]
+							csv_entry = [sept,temp_object.get_n(), temp_object.totient, e_val,holes_num, transparency]
 							writer.writerow(csv_entry)
 					
 					except Exception as e: 

@@ -11,20 +11,14 @@ import traceback
 def search_septuple(rsa_object):
 	#List to hold the holes
 	holes = []
-	#Generate the plaintext list of integers
-	integer_list = [i for i in range(2, rsa_object.n-1)]
-	#List to hold the encrypted integers
-	encrypted_integers = []
 	
-	#Encrypt all the integers and store them in the encrypted integer list
-	for i in integer_list:
-		encrypted_integers.append(int(rsa_object.encrypt_int(i)))
-	
-	#Loop through the original list and check for all cases where the plaintext=cipher text
-	for index, val in enumerate(integer_list):
-		if integer_list[index] == encrypted_integers[index]:
-			holes.append(val)
-	#Return a list of all holes found for the given septuple
+	count = 2
+	while(1):
+		if ((int(rsa_object.encrypt_int(count))) == count):
+			holes.append(count)
+		count +=1
+		if count == rsa_object.n-1:
+			break
 	return holes
 	
 def load_primes(file_name):
@@ -36,6 +30,8 @@ def load_primes(file_name):
 			for val in split:
 				if val.isnumeric():
 					primes.append(int(val))
+					
+	f.close()
 	return primes
 
 def get_start_prime():
