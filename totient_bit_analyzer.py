@@ -9,13 +9,13 @@ import traceback
 
 #Function takes a RSA object and returns a list of all holes from 2 to n-2
 def search_septuple(rsa_object):
-	#List to hold the holes
-	holes = []
+	#Hole counter
+	holes = 0
 	
 	count = 2
 	while(1):
 		if ((int(rsa_object.encrypt_int(count))) == count):
-			holes.append(count)
+			holes +=1
 		count +=1
 		if count == rsa_object.n-1:
 			break
@@ -121,15 +121,15 @@ def run():
 						
 						
 						#Analyze the holes in the septuple
-						holes_list = search_septuple(temp_object)
-						holes_num = len(holes_list)
+						holes_num = search_septuple(temp_object)
+						
 						left_holes = []
 						right_holes = []
-						for index, val in enumerate(holes_list):
-							if (index < (len(holes_list)/2)):
-								left_holes.append(val)
-							else:
-								right_holes.append(val)
+						#for index, val in enumerate(holes_list):
+						#	if (index < (len(holes_list)/2)):
+						#		left_holes.append(val)
+						#	else:
+						#		right_holes.append(val)
 						transparency = round((float(holes_num)/(temp_object.n -1))*100)
 						print("Analyzing sept: ", sept, " Holes - ", holes_num)
 						#Append to the output file 
