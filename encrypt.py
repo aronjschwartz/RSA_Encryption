@@ -23,9 +23,9 @@ class encryption_set():
 		self.totient = self.generate_totient(p, q)
 		
 		self.valid_e_list =[]
+		#Debug mode default to false
 		self.debug = False
-		
-		
+			
 		#Make randomly valid keys if none are passed in, otherwise set the the specified value
 		if (custom_e == None):
 			self.e = self.generate_random_valid_e()

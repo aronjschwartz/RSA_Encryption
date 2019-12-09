@@ -20,7 +20,7 @@ def get_string_from_ascii(input_list):
 
 def main():
 	#Sample plain text to encrypt
-	plain_text = "Can is pretty good at coding, but Aron is WAY better"
+	plain_text = "But soft, what light from yonder window breaks? It is the East...and Juliet is the Sun"
 	
 	
 	#Variables to store ascii-lists, plain-text lists, etc

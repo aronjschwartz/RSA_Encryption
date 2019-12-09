@@ -11,7 +11,6 @@ import traceback
 def search_septuple(rsa_object):
 	#Hole counter
 	holes = 0
-	
 	count = 2
 	while(1):
 		if ((int(rsa_object.encrypt_int(count))) == count):
@@ -101,7 +100,7 @@ def run():
 	q_list = prime_list[start_choice-1:end_choice-1]
 	print("Start val: ", prime_list[start_choice-1], " End val: ", prime_list[end_choice -1])
 	e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
-	pub_keys = [3, 5, 7, 17, 257, 65537]
+	pub_keys = [3, 5, 17, 257, 65537]
 	#Loop through all p/q combinations trying each e-value for all combinations
 	start_time = time.time()
 	for p_val in p_list:
@@ -130,7 +129,7 @@ def run():
 						#		left_holes.append(val)
 						#	else:
 						#		right_holes.append(val)
-						transparency = round((float(holes_num)/(temp_object.n -1))*100)
+						transparency = round((float(holes_num)/(temp_object.n -1))*100, 2)
 						print("Analyzing sept: ", sept, " Holes - ", holes_num)
 						#Append to the output file 
 						with open(file_name, "a", newline='') as csv_file:
