@@ -1,6 +1,6 @@
 #Program: Checks for totient hot bit vs transparency
 #Author: Aron Schwartz
-#Last Edit: 10/25/2019
+#Last Edit: 12/9/2019
 
 import encrypt
 import time
@@ -80,7 +80,7 @@ def get_number_primes_to_analyze():
 		return choice
 
 def run():
-	
+	#Get prime list from million primes file, and get starting/ending index choices
 	prime_list = load_primes("primes1.txt")
 	start_choice = get_start_prime()
 	end_choice = get_end_prime()
@@ -93,13 +93,10 @@ def run():
 	with open(file_name, "w") as csv_file:
 		writer = csv.writer(csv_file,  dialect='excel')
 		writer.writerow(header)
-    
-	
 
 	p_list = prime_list[start_choice-1:end_choice-1]
 	q_list = prime_list[start_choice-1:end_choice-1]
 	print("Start val: ", prime_list[start_choice-1], " End val: ", prime_list[end_choice -1])
-	e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
 	pub_keys = [3, 5, 17, 257, 65537]
 	#Loop through all p/q combinations trying each e-value for all combinations
 	start_time = time.time()
@@ -112,23 +109,12 @@ def run():
 					try:
 						#Make a temp object for the current septuple
 						temp_object = encrypt.encryption_set(p=p_val, q=q_val, custom_e=e_val)
-						#temp_object.enable_debug_mode()
 					
 						sept = temp_object.get_septuple();
-						
-						
-						
-						
 						#Analyze the holes in the septuple
 						holes_num = search_septuple(temp_object)
 						
-						left_holes = []
-						right_holes = []
-						#for index, val in enumerate(holes_list):
-						#	if (index < (len(holes_list)/2)):
-						#		left_holes.append(val)
-						#	else:
-						#		right_holes.append(val)
+						#Round transparency to nearest hundreth
 						transparency = round((float(holes_num)/(temp_object.n -1))*100, 2)
 						print("Analyzing sept: ", sept, " Holes - ", holes_num)
 						#Append to the output file 

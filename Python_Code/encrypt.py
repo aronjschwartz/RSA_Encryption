@@ -1,20 +1,21 @@
-#Program: This file encrypts an integer using the RSA method
+#Program: This file implements the RSA python encyrption object code
 #Author: Aron Schwartz
-#Last edit: 10/5/2019
+#Last edit: 12/9/2019
 
-#Found this on stack overflow, efficient and quick way to check for co-primality
+
 from math import gcd as bltin_gcd
 import random
 import math
 import time
+
 #Simple function to check for co-primality 
 def check_coprimality(a, b):
     return bltin_gcd(a, b) == 1
 
-#Class to generate all required numbers for an RSA encryption instance.  Needs the two primes for initialization
+#Encryption object
 class encryption_set():
 
-	#Need the original primes to initialize the object
+	#Need P and Q at minimum to initialize the object
 	def __init__(self, p, q, custom_e=None, custom_d=None, custom_k =None):
 		#Assign p, q, n, and totient
 		self.p = p
@@ -40,7 +41,7 @@ class encryption_set():
 		if custom_k != None:
 			self.k = custom_k
 	
-
+	#Function to make a list of all valid E from 2 to N
 	def generate_all_possible_e(self):
 		if (self.debug == True):
 			print("Generating all possible e-values")
@@ -48,7 +49,7 @@ class encryption_set():
 			if (check_coprimality(self.totient, i)):
 				self.valid_e_list.append(i)
 		
-		
+	#Function to generate all D/K combinations
 	def generate_all_d_k_combinations(self, temp_e):
 		
 		dk_list = []		
@@ -60,14 +61,11 @@ class encryption_set():
 			possible_d = (1 + (possible_k)*(self.totient))/temp_e
 			#If the potential decryption-key comes out as a whole integer, it will work as a valid decryption key
 			if (possible_d.is_integer()):
-				dk_list.append([int(possible_d), int(possible_k)])
-				
-			possible_k +=1
-				
-				
+				dk_list.append([int(possible_d), int(possible_k)])			
+			possible_k +=1				
 		return dk_list
 	
-	#Function to generate a valid public key (encryption key)
+	#Function to generate a valid E
 	def generate_random_valid_e(self):   
 		candidate_found = False
 		while(candidate_found == False):
@@ -82,7 +80,7 @@ class encryption_set():
 			print("Generated e: ", str(rand_num))
 		return rand_num	
 	
-	#Function to generate a valid private key (decryption key)
+	#Function to generate a valid D
 	def generate_random_valid_d(self):
 		possible_d = 1
 		possible_k = 1
@@ -139,21 +137,25 @@ class encryption_set():
 		print("D: ", self.d)
 		print("K: ", self.k)
 	
+	#Function to print out P, Q, N, Totient
 	def print_p_q_n_t(self):
 		print("P: ", self.p)
 		print("Q: ", self.q)
 		print("N: ", self.n)
 		print("T: ", self.totient)
 	
+	#Functions to enable or disable debug printing
 	def enable_debug_mode(self):
 		self.debug = True
 		
 	def disable_debug_mode(self):
 		self.debug = False
 	
+	#Function to fetch N
 	def get_n(self):
 		return self.n
 	
+	#Function to obtain the full septuple as a list of form [P, Q, N, Totient, E, K, D]
 	def get_septuple(self):
 		return [self.p, self.q, self.n, self.totient, self.e, self.k, self.d]
 	

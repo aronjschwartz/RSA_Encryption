@@ -1,13 +1,12 @@
 #Program: Analyzes all holes for all possible septuple combinations up to the end of the prime list
 #Author: Aron Schwartz
-#Last Edit: 10/25/2019
+#Last Edit: 12/9/2019
 
 import encrypt
 import time
 import csv
 import traceback
 
-#Function takes a RSA object and returns a list of all holes from 2 to n-2
 #Function takes a RSA object and returns a list of all holes from 2 to n-2
 def search_septuple(rsa_object):
 	#Hole counter
@@ -20,7 +19,8 @@ def search_septuple(rsa_object):
 		if count == rsa_object.n-1:
 			break
 	return holes
-	
+
+#Function to load primes from input file
 def load_primes(file_name):
 	primes = []
 	f = open(file_name, 'r')
@@ -32,6 +32,7 @@ def load_primes(file_name):
 					primes.append(int(val))
 	return primes
 
+#Function to prompt user for the starting prime index
 def get_start_prime():
 	#Loop until valid input entered
 		while(1):
@@ -46,7 +47,8 @@ def get_start_prime():
 				print("Exception occured: ", str(e))
 				continue
 		return choice
-		
+
+#Function to prompt user for the ending prime index	
 def get_end_prime():
 	#Loop until valid input entered
 		while(1):
@@ -61,32 +63,19 @@ def get_end_prime():
 				print("Exception occured: ", str(e))
 				continue
 		return choice
-		
-def get_number_primes_to_analyze():
 	
-		#Loop until valid input entered
-		while(1):
-			choice = input("Enter number of primes to check: ")
-			try:
-				if int(choice) > 0:
-					return int(choice)
-				else:
-					print("Positive numbers only")
-					choice = input("Enter number of primes to check:  ")
-			except Exception as e:
-				print("Exception occured: ", str(e))
-				continue
-		return choice
-
+	
+#Primary execution function
 def run():
-	
+	#Get handle to prime list file
 	prime_list = load_primes("primes1.txt")
+	#Get the start and end choice
 	start_choice = get_start_prime()
 	end_choice = get_end_prime()
 	print("Analyzing prime ", start_choice, " to prime ", end_choice, " in first million primes")
 	time.sleep(3)
 	
-	
+	#Create file name from the start/end choices
 	file_name = "./Excel_Data/prime_" + str(start_choice) + "_to_" + str(end_choice) + "_holes.csv"
 	header = ["p, q, n, Phi, e, k, d", "n", "totient", "e", "# holes", "Transparency Percentage"]
 	with open(file_name, "w") as csv_file:
@@ -94,11 +83,10 @@ def run():
 		writer.writerow(header)
     
 	
-
+	#Create our prime lists
 	p_list = prime_list[start_choice-1:end_choice-1]
 	q_list = prime_list[start_choice-1:end_choice-1]
 	print("Start val: ", prime_list[start_choice-1], " End val: ", prime_list[end_choice -1])
-	#e_list = [3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89]
 	pub_keys = [3, 5, 17, 257, 65537]
 	#Loop through all p/q combinations trying each e-value for all combinations
 	start_time = time.time()
@@ -116,10 +104,11 @@ def run():
 						
 						#Analyze the holes in the septuple
 						holes_num = search_septuple(temp_object)
-		
+						
+						#Round transparency to nearest hundreth
 						transparency = round((float(holes_num)/(temp_object.n -1))*100, 2)
 						print("Analyzing sept: ", sept, " Holes - ", holes_num)
-						#Append to the output file 
+						#Append to the output file each iteration
 						with open(file_name, "a", newline='') as csv_file:
 							writer = csv.writer(csv_file,  dialect='excel')
 							csv_entry = [sept,temp_object.get_n(), temp_object.totient, e_val,holes_num, transparency]

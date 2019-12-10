@@ -1,6 +1,6 @@
 #Program: Simply program to ensure the functionality of the RSA encryption.  Enrypts a plaintext, shows the cipher, and decrypts back to original plain text
 #Author: Aron Schwartz
-#Last edit: 10/21/2019
+#Last edit: 12/9/2019
 
 import encrypt
 

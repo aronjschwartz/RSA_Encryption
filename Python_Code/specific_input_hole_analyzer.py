@@ -1,6 +1,6 @@
 #Program: Checks for totient hot bit vs transparency
 #Author: Aron Schwartz
-#Last Edit: 10/25/2019
+#Last Edit: 12/9/2019
 
 import encrypt
 import time
@@ -87,6 +87,7 @@ def run():
 	#Load our chosen primes
 	p_list = [start_choice]
 	q_list = [end_choice]
+	
 	#Test all valid e from 0 to 65537.  
 	e_list = prime_list[0:6541]
 
@@ -107,7 +108,8 @@ def run():
 					sept = temp_object.get_septuple();
 									
 					#Analyze the holes in the septuple
-					holes_num = search_septuple(temp_object)				
+					holes_num = search_septuple(temp_object)	
+					#Round transparency to nearest hundreth
 					transparency = round((float(holes_num)/(temp_object.n -1))*100, 2)
 					
 					#Append to the output file 
