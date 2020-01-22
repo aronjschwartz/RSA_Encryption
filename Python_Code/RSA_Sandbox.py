@@ -1,4 +1,8 @@
-
+#********************************************************
+#*                                                  
+#*                     RSA Sandbox 
+#*
+#********************************************************
 
 from encrypt import encryption_set
 import time
@@ -22,7 +26,7 @@ class RSA_sandbox():
 		print("4  - Generate Prime Numbers")
 		print("5  - Find Holes")
 		print("6  - Output Results")
-		print("7  - Specify Septuples")
+		print("7  - Create/View Septuples")
 		print("8  - Analyze Septuple")
 		print("9  - Plaintext Message Selection")
 		print("10 - Specify Ciphertext")
@@ -35,8 +39,12 @@ class RSA_sandbox():
 		print("2 - Encrypt an input string")
 	
 	def septuple_selection_menu(self):
-		print("1 - Select active septuple")
-		print("2 - 
+		print("1 - Change active septuple")
+		print("2 - Add Septuple")
+		print("3 - Clear septuples")
+		print("4 - View septuples")
+		print("Q - Return to main menu")
+		
 	
 	#Borrowed from provided code from Professor Shirley (ElementalNumberTheory.py)
 	def primes(self, n):
@@ -66,6 +74,20 @@ class RSA_sandbox():
 	def selection_prompt(self):
 		selection = input("Enter selection: ")
 		return selection
+	
+	def create_septuple_user_input(self):
+		p_choice = int(input("Enter p: "))
+		q_choice = int(input("Enter q: "))
+		choice = input("Specify e? [Y/N]: ")
+		if ((choice == "y") or (choice == "Y")):
+			e_choice = int(input("Select e: "))
+			septuple_object = encryption_set(p=p_choice, q=q_choice, custom_e = e_choice)
+		else:
+			septuple_object = encryption_set(p =p_choice, q=q_choice, custom_e = 65537)
+		print("/nEncryption object created!")
+		septuple_object.to_String()
+		print()
+		return septuple_object
 	
 	def encryption_decryption_no_padding(self):
 		print("Encrypt/Decrypt without padding selected")
@@ -164,15 +186,42 @@ class RSA_sandbox():
 
 	def output_results(self):
 		print("Result output and visualization selected")
-
-	def specify_septuples(self):
-		print("Specify septuples selected")
-		print("*** Displaying septuple list ***")
+	
+	
+	def view_septuples(self):
+		print("*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
 		for index, object in enumerate(self.encryption_objects):
 			print(index + 1, " - ", object.get_septuple())
-			
+	
+	def specify_septuples(self):
+		print("Specify septuples selected")
+		self.view_septuples()
+		self.septuple_selection_menu()
+		choice = self.selection_prompt()
+		while(1):
+			if (choice == "1"):
+				print("1")
+				#Change active
+			elif (choice == "2"):
+				print("Creating septuple..")
+				septuple = self.create_septuple_user_input()
+				self.encryption_objects.append(septuple)
+				choice = self.selection_prompt()
+			elif (choice == "3"):
+				print("Clearing septuple list...")
+				self.encryption_objects.clear()
+				choice = self.selection_prompt()
+			elif (choice == "4"):
+				self.view_septuples()
+				choice = self.selection_prompt()
+			elif ((choice == "q") or (choice == "Q")):
+				break
+			else:
+				print("Invalid choice!")
+				choice = self.selection_prompt()
+		return
 		
-			
+		
 	def analyze_septuple(self):	
 		print("Analyze septuple selected")
 		
