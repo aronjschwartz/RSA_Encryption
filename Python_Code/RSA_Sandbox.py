@@ -14,6 +14,7 @@ class RSA_sandbox():
 		self.plain_text = None
 		self.active_encryption_object = None
 		self.encryption_objects = []
+		self.prime_list = []
 		self.public_keys = [3, 5, 17, 257, 65537]
 		self.welcome_message()
 		self.display_main_menu()
@@ -75,7 +76,18 @@ class RSA_sandbox():
 		selection = input("Enter selection: ")
 		return selection
 	
+	def primes_selection_prompt(self):
+		print("TEST")
+		print("1 - Generate prime list")
+		print("2 - Generate prime list (display only)")
+		print("3 - Clear prime list")
+		print("4 - Display prime list")
+		print("Q - Return to main menu")
+	
 	def create_septuple_user_input(self):
+		if len(self.prime_list) == 0:
+			print("No primes list loaded")
+
 		p_choice = int(input("Enter p: "))
 		q_choice = int(input("Enter q: "))
 		choice = input("Specify e? [Y/N]: ")
@@ -84,7 +96,7 @@ class RSA_sandbox():
 			septuple_object = encryption_set(p=p_choice, q=q_choice, custom_e = e_choice)
 		else:
 			septuple_object = encryption_set(p =p_choice, q=q_choice, custom_e = 65537)
-		print("/nEncryption object created!")
+		print("\nEncryption object created!")
 		septuple_object.to_String()
 		print()
 		return septuple_object
@@ -95,19 +107,11 @@ class RSA_sandbox():
 		if self.active_encryption_object is None:
 			print("No active encryption object detected, generating...")
 			#Get p and q from the user, and see if they want to specify other values
-			p_choice = int(input("Enter p: "))
-			q_choice = int(input("Enter q: "))
-			choice = input("Specify e? [Y/N]: ")
-			if ((choice == "y") or (choice == "Y")):
-				e_choice = int(input("Select e: "))
-				self.active_encryption_object = encryption_set(p=p_choice, q=q_choice, custom_e = e_choice)
-			else:
-				self.active_encryption_object = encryption_set(p =p_choice, q=q_choice, custom_e = 65537)
+			septuple = self.create_septuple_user_input()
 			print("Encryption object created!")
-			self.active_encryption_object.to_String()
+			self.encryption_objects.append(self.active_encryption_object)
 		else:
 			print("Active septuple: ", self.active_encryption_object.get_septuple())
-		self.encryption_objects.append(self.active_encryption_object)
 		#See what the user wants to encrypt
 		self.encryption_selection_menu()
 		choice = self.selection_prompt()
@@ -167,10 +171,34 @@ class RSA_sandbox():
 		print("Key generation selected")
 
 	def generate_primes(self):
-		print("Prime number generation selected")
-		n = input("Enter upper limit for prime generation: ")
-		prime_list = self.primes(int(n))
-		print(prime_list)
+		print("Prime number generation selected...")
+		self.primes_selection_prompt()
+		while(1):
+			choice = self.selection_prompt()
+			if (choice == "1"):		
+				n = input("Enter upper limit for prime generation: ")
+				prime_list = self.primes(int(n))
+				self.prime_list.append(prime_list)
+				print(prime_list)
+			elif (choice == "2"):
+				n = input("Enter upper limit for prime generation: ")
+				prime_list = self.primes(int(n))
+				print(prime_list)
+			elif (choice == "3"):
+				print("Erasing prime list...")
+				self.prime_list = []
+			elif(choice == "4"):
+				if len(self.prime_list) > 0:
+					print(self.prime_list)
+				else:
+					print("List is empty!")
+			elif ((choice == "Q") or (choice == "q")):
+				break
+			else:
+				print("Invalid input!")
+				self.primes_selection_prompt()
+				choice = self.selection_prompt()
+		return
 
 	def hole_search(self):
 		print("Hole search selected, analyzing the active septuple ", self.active_encryption_object.get_septuple)
@@ -191,7 +219,10 @@ class RSA_sandbox():
 	def view_septuples(self):
 		print("*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
 		for index, object in enumerate(self.encryption_objects):
-			print(index + 1, " - ", object.get_septuple())
+			if (self.active_encryption_object == object):
+				print(index, " - ", str(object.get_septuple()) + "*** active ***")
+			else:
+				print(index, " - ", str(object.get_septuple()))
 	
 	def specify_septuples(self):
 		print("Specify septuples selected")
@@ -200,19 +231,30 @@ class RSA_sandbox():
 		choice = self.selection_prompt()
 		while(1):
 			if (choice == "1"):
-				print("1")
-				#Change active
+				print("Changing active septuple...")
+				if (len(self.encryption_objects) == 0):
+					print("No septuples loaded!")
+				else:
+					for index, object in enumerate(self.encryption_objects):
+						print(str(index) + " - " + str(object.get_septuple()))
+					choice = input("Select new active septuple: ")
+					self.active_encryption_object = self.encryption_objects[int(choice)]
+				self.septuple_selection_menu()
+				choice = self.selection_prompt()
 			elif (choice == "2"):
 				print("Creating septuple..")
 				septuple = self.create_septuple_user_input()
 				self.encryption_objects.append(septuple)
+				self.septuple_selection_menu()
 				choice = self.selection_prompt()
 			elif (choice == "3"):
 				print("Clearing septuple list...")
 				self.encryption_objects.clear()
+				self.septuple_selection_menu()
 				choice = self.selection_prompt()
 			elif (choice == "4"):
 				self.view_septuples()
+				self.septuple_selection_menu()
 				choice = self.selection_prompt()
 			elif ((choice == "q") or (choice == "Q")):
 				break
