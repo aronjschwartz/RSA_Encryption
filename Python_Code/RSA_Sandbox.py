@@ -1,10 +1,18 @@
 #********************************************************
 #*                                                  
-#*                     RSA Sandbox 
+#* File:        RSA_sandbox.py
+#* Description: The RSA Sandbox allows free reign to experiment with, 
+#* create, analyze, and explore RSA encryption objects and their associated
+#* strength with regards to fixed point occurence.
+#*
+#* Author: Aron Schwartz
+#* Last Edit: 1/26/2020
 #*
 #********************************************************
 
 from encrypt import encryption_set
+from menus_prompts import *
+from encryption_test import *
 import time
 import math
 	
@@ -15,37 +23,37 @@ class RSA_sandbox():
 		self.active_encryption_object = None
 		self.encryption_objects = []
 		self.prime_list = []
+		self.encryption_keys = {} #Dict to associate with sept
 		self.public_keys = [3, 5, 17, 257, 65537]
 		self.welcome_message()
 		self.display_main_menu()
 		
-		
+	#Menu and prompt functions
 	def display_main_menu(self):
-		print("1  - Encrypt/Decrypt without padding")
-		print("2  - Encrypt with padding")
-		print("3  - Generate Keys")
-		print("4  - Generate Prime Numbers")
-		print("5  - Find Holes")
-		print("6  - Output Results")
-		print("7  - Create/View Septuples")
-		print("8  - Analyze Septuple")
-		print("9  - Plaintext Message Selection")
-		print("10 - Specify Ciphertext")
-		print("M  - Reload main menu")
-		print("H  - Help Topics")
-		print("Q  - Exit program\n")
+		display_main_menu()
 		
 	def encryption_selection_menu(self):
-		print("1 - Encrypt plain text file")
-		print("2 - Encrypt an input string")
+		encryption_selection_menu()
 	
 	def septuple_selection_menu(self):
-		print("1 - Change active septuple")
-		print("2 - Add Septuple")
-		print("3 - Clear septuples")
-		print("4 - View septuples")
-		print("Q - Return to main menu")
+		septuple_selection_menu()
+	
+	def primes_selection_menu(self):
+		primes_selection_menu()
+	
+	def key_generation_menu(self):
+		key_generation_menu()
+	
+	def welcome_message(self):
+		welcome_message()
 		
+	def main_menu_selection_prompt(self):
+		selection = main_menu_selection_prompt()
+		return selection
+	
+	def selection_prompt(self):
+		selection = selection_prompt()
+		return selection
 	
 	#Borrowed from provided code from Professor Shirley (ElementalNumberTheory.py)
 	def primes(self, n):
@@ -60,30 +68,6 @@ class RSA_sandbox():
 			X = [a for a in X if a % p != 0]                        # (7)
 		return P + X                                                # (8)
 
-	def welcome_message(self):
-		print("*********************************************************")
-		print("*                                                       *")
-		print("*          Welcome to the RSA Encyrption Sandbox        *")
-		print("*                                                       *")
-		print("*********************************************************")
-		print()
-		
-	def main_menu_selection_prompt(self):
-		selection = input("Enter selection (M/m to reload menu): ") 
-		return selection
-	
-	def selection_prompt(self):
-		selection = input("Enter selection: ")
-		return selection
-	
-	def primes_selection_prompt(self):
-		print("TEST")
-		print("1 - Generate prime list")
-		print("2 - Generate prime list (display only)")
-		print("3 - Clear prime list")
-		print("4 - Display prime list")
-		print("Q - Return to main menu")
-	
 	def create_septuple_user_input(self):
 		if len(self.prime_list) == 0:
 			print("No primes list loaded")
@@ -98,6 +82,8 @@ class RSA_sandbox():
 			septuple_object = encryption_set(p =p_choice, q=q_choice, custom_e = 65537)
 		print("\nEncryption object created!")
 		septuple_object.to_String()
+		
+		self.add_key_to_septuple(septuple_object, septuple_object.get_e())
 		print()
 		return septuple_object
 	
@@ -109,6 +95,7 @@ class RSA_sandbox():
 			#Get p and q from the user, and see if they want to specify other values
 			septuple = self.create_septuple_user_input()
 			print("Encryption object created!")
+			self.active_encryption_object = septuple
 			self.encryption_objects.append(self.active_encryption_object)
 		else:
 			print("Active septuple: ", self.active_encryption_object.get_septuple())
@@ -125,14 +112,14 @@ class RSA_sandbox():
 			decrypted_cipher_text = ""
 			plain_text_string = input("Enter string to encrypt: ")
 			#Obtain a list of ascii values for the plain text
-			plain_text_ascii = self.get_ascii_list(plain_text_string)
+			plain_text_ascii = get_ascii_list(plain_text_string)
 
 			#Encrypt each number in the plain-text ascii list to obtain the cipher-ascii list
 			for i in plain_text_ascii:
 				cipher_ascii.append(int(self.active_encryption_object.encrypt_int(i)))
 				
 			#Generate the cipher text from the cipher-ascii list
-			cipher_text = self.get_string_from_ascii(cipher_ascii)
+			cipher_text = get_string_from_ascii(cipher_ascii)
 			
 			
 			#Decrypt the cipher-ascii.  This should result back to the original plain-ascii list
@@ -148,31 +135,67 @@ class RSA_sandbox():
 			print("\nCipher text: ", cipher_text)
 			print("\nDecrypted cipher text: ", decrypted_cipher_text)
 			print()
-			
-	#Function to return an ascii list from a string
-	def get_ascii_list(self, input_string):
-		out = []
-		for i in input_string:
-			out.append(ord(i))
-		return out
-
-	#Function to return a string from an ascii list
-	def get_string_from_ascii(self, input_list):
-		out = ""
-		for i in input_list:
-			out += chr(i)	
-		return out
-
-		
+				
 	def encrypt_padding(self):
 		print("Encryption with padding selected")
-
+	
+	
+	def show_keys_for_septuple(self, septuple):
+		print("\n****Displaying keys for septuple ", septuple.get_septuple(), " *****")
+		for encryption_key in self.encryption_keys[septuple]:
+			print("(", septuple.get_n(), ",",encryption_key, ")")
+		return
+	
+	def add_key_to_septuple(self, septuple, key):
+		if septuple not in self.encryption_keys:
+			self.encryption_keys[septuple] = [key]
+			print("Key ", str(key), " added to septuple ", str(septuple.get_septuple()))
+		elif key in self.encryption_keys[septuple]:
+			print("Key ", str(key), " already exists!")
+		else:
+			self.encryption_keys[septuple].append(key)
+			print("Key ", str(key), " appended to septuple ", str(septuple.get_septuple()))
+		return
+	
+	
+	
 	def generate_keys(self):  
 		print("Key generation selected")
+		self.key_generation_menu()
+		choice = selection_prompt()
+		while(1):
+			if (choice == "1"):
+				if (len(self.encryption_objects) == 0):
+					print("No septuples loaded!")
+					self.key_generation_menu()
+					choice = selection_prompt()
+				else:
+					self.view_septuples()
+					choice = input("Select septuple to add key: ")
+					e_choice = input("Enter e value: ")
+					self.add_key_to_septuple(self.encryption_objects[int(choice)], int(e_choice))
+					self.key_generation_menu()
+					choice = selection_prompt()
+					
+				
+				
+			elif (choice == "2"):
+				#Clear keys
+				print("Clear keys")
+				self.key_generation_menu()
+				choice = selection_prompt()
+			elif (choice == "3"):
+				self.view_septuples()
+				choice = input("Select septuple to view keys: ")
+				self.show_keys_for_septuple(self.encryption_objects[int(choice)])
+				self.key_generation_menu()
+				choice = selection_prompt()
+			elif ((choice == "q") or (choice == "Q")):
+				break
 
 	def generate_primes(self):
 		print("Prime number generation selected...")
-		self.primes_selection_prompt()
+		self.primes_selection_menu()
 		while(1):
 			choice = self.selection_prompt()
 			if (choice == "1"):		
@@ -196,7 +219,7 @@ class RSA_sandbox():
 				break
 			else:
 				print("Invalid input!")
-				self.primes_selection_prompt()
+				self.primes_selection_menu()
 				choice = self.selection_prompt()
 		return
 

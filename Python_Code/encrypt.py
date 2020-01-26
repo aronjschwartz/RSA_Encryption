@@ -155,6 +155,9 @@ class encryption_set():
 	def get_n(self):
 		return self.n
 	
+	def get_e(self):
+		return self.e
+	
 	#Function to obtain the full septuple as a list of form [P, Q, N, Totient, E, K, D]
 	def get_septuple(self):
 		return [self.p, self.q, self.n, self.totient, self.e, self.k, self.d]

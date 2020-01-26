@@ -60,5 +60,4 @@ def main():
 	print("\nCipher text: ", cipher_text)
 	print("\nDecrypted cipher text: ", decrypted_cipher_text)
 	
-main()
 
