@@ -13,6 +13,7 @@
 from encrypt import encryption_set
 from menus_prompts import *
 from encryption_test import *
+from configparser import ConfigParser
 import time
 import math
 	
@@ -55,14 +56,38 @@ class RSA_sandbox():
 		selection = selection_prompt()
 		return selection
 	
+	def save_settings(self):
+		config = ConfigParser()
+		
+	def display_system_data(self):
+		#Septuples with keys, tabbed output
+		count = 1
+		print("******* Septuples and keys ********")
+		for key, value in self.encryption_keys.items():
+			print(str(count), " - ", key.get_septuple())
+			for encryption_key in value:
+				print("\t", "(", str(key.get_n()), ",", str(encryption_key), ")")
+		#Primes
+		print("************ Primes *************")
+		if len(self.prime_list) > 0:
+			first_last = [self.prime_list[0], self.prime_list[-1]]
+			print("All primes between: ", str(first_last))
+		return
+		
+		
+		
+	
 	#Borrowed from provided code from Professor Shirley (ElementalNumberTheory.py)
-	def primes(self, n):
-		if n <= 1:
+	def primes(self, lower_bound, upper_bound):
+		if upper_bound <= 1:
 			return []
-		X = [i for i in range(3, n + 1, 2)]                         # (1)
-		P = [2]                                                     # (2)
-		sqrt_n = math.sqrt(n)                                       # (3)
-		while len(X) > 0 and X[0] <= sqrt_n:                        # (4)
+		#Even lower bound, need to make it odd 
+		elif (lower_bound % 2 == 0):
+			lower_bound = lower_bound + 1
+		X = [i for i in range(lower_bound, upper_bound + 1, 2)]                         # (1)
+		P = []                                                     # (2)
+		sqrt_upper_bound = math.sqrt(upper_bound)                                       # (3)
+		while len(X) > 0 and X[0] <= sqrt_upper_bound:                        # (4)
 			p = X[0]                                                # (5)
 			P.append(p)                                             # (6)
 			X = [a for a in X if a % p != 0]                        # (7)
@@ -199,13 +224,16 @@ class RSA_sandbox():
 		while(1):
 			choice = self.selection_prompt()
 			if (choice == "1"):		
-				n = input("Enter upper limit for prime generation: ")
-				prime_list = self.primes(int(n))
-				self.prime_list.append(prime_list)
+				lower_limit = input("Enter lower limit for prime generation: ")
+				upper_limit = input("Enter upper limit for prime generation: ")
+				prime_list = self.primes(int(lower_limit), int(upper_limit))
+				for val in prime_list:
+					self.prime_list.append(val)
 				print(prime_list)
 			elif (choice == "2"):
-				n = input("Enter upper limit for prime generation: ")
-				prime_list = self.primes(int(n))
+				lower_limit = input("Enter lower limit for prime generation: ")
+				upper_limit = input("Enter upper limit for prime generation: ")
+				prime_list = self.primes(int(lower_limit), int(upper_limit))
 				print(prime_list)
 			elif (choice == "3"):
 				print("Erasing prime list...")
@@ -224,7 +252,7 @@ class RSA_sandbox():
 		return
 
 	def hole_search(self):
-		print("Hole search selected, analyzing the active septuple ", self.active_encryption_object.get_septuple)
+		print("Hole search selected, analyzing the active septuple ", self.active_encryption_object.get_septuple())
 		#Analyze the holes in the septuple
 		holes_num = self.search_septuple(self.active_encryption_object)
 		
@@ -292,7 +320,10 @@ class RSA_sandbox():
 		
 	def set_plaintext(self):
 		print("Plaintext customization selected")
-
+	
+	
+	
+	
 	def help_topics(self):
 		print("Help topics selected")
 		
@@ -332,6 +363,8 @@ class RSA_sandbox():
 				self.set_plaintext()
 			elif(choice == "10"):
 				print("Ciphertext choice selected")
+			elif(choice == "11"):
+				self.display_system_data()
 			elif((choice == "M") or (choice == "m")):
 				self.display_main_menu()
 			elif((choice == "H") or (choice == "h")):
