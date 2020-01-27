@@ -13,6 +13,7 @@
 from encrypt import encryption_set
 from menus_prompts import *
 from encryption_test import *
+from save_load import *
 from configparser import ConfigParser
 import time
 import math
@@ -56,8 +57,52 @@ class RSA_sandbox():
 		selection = selection_prompt()
 		return selection
 	
-	def save_settings(self):
-		config = ConfigParser()
+	def save_data(self):
+		#Get folder name to save data from the user
+		folder_name = input("Enter folder name (Ex: Arons_Settings): ")
+		os.mkdir(folder_name)
+		save_encryption_objects(folder_name, self.encryption_objects)
+		save_key_data(folder_name, self.encryption_keys)
+		save_primes_data(folder_name, self.prime_list)
+		save_active_object_data(folder_name, self.active_encryption_object)
+		
+		#TODO: Implement plain text saving		
+		
+		print("Save Complete")
+		return
+		
+	def load_data(self):
+		folder_name = input("Enter folder name (Ex: Arons_Settings): ")
+		if os.path.isdir("./" + str(folder_name)):
+			print("Folder '", str(folder_name), "' found! Loading settings...")
+			self.encryption_objects = load_encryption_objects(folder_name)
+			self.encryption_keys = load_key_data(folder_name)
+			self.prime_list = load_primes_data(folder_name)
+			self.active_encryption_object = load_active_object_data(folder_name)
+			print("Load Complete")
+		else:
+			print("Folder '", str(folder_name), "' does not exist! Data load failed")
+		return
+		
+	def system_data_management(self):
+		system_data_menu()
+		choice = selection_prompt()
+		while(1):
+			if (choice == "1"):
+				self.save_data()
+				system_data_menu()
+				choice = selection_prompt()
+			elif(choice == "2"):
+				self.load_data()
+				system_data_menu()
+				choice = selection_prompt()
+			elif((choice == "q") or (choice == "Q")):
+				break
+			else:
+				print("Invalid choice!")
+				system_data_menu()
+				choice = selection_prompt()
+		return
 		
 	def display_system_data(self):
 		#Septuples with keys, tabbed output
@@ -365,6 +410,8 @@ class RSA_sandbox():
 				print("Ciphertext choice selected")
 			elif(choice == "11"):
 				self.display_system_data()
+			elif(choice == "12"):
+				self.system_data_management()
 			elif((choice == "M") or (choice == "m")):
 				self.display_main_menu()
 			elif((choice == "H") or (choice == "h")):
