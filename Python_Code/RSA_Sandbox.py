@@ -297,16 +297,44 @@ class RSA_sandbox():
 		return
 
 	def hole_search(self):
-		print("Hole search selected, analyzing the active septuple ", self.active_encryption_object.get_septuple())
-		#Analyze the holes in the septuple
-		holes_num = self.search_septuple(self.active_encryption_object)
+		holes_search_menu()
+		choice = selection_prompt()
+		while(1):
+			if(choice == "1"):
+				print("Analyze septuple")
+				print("Hole search selected, analyzing the active septuple ", self.active_encryption_object.get_septuple())
+				#Analyze the holes in the septuple
+				holes_num = self.search_septuple(self.active_encryption_object)
+				
+				#Round transparency to nearest hundreth
+				transparency = round((float(holes_num)/(self.active_encryption_object.n -1))*100, 2)
+				print("***** Results *****: ")
+				print("Septuple: ", self.active_encryption_object.get_septuple())
+				print("Holes found: ", holes_num, " Transparency: ", transparency, "%")
+				print()
+				
+				holes_search_menu()
+				choice = selection_prompt()
+				
+			elif(choice == "2"):
+				print("Compare all septuples")
+				
+				
+				holes_search_menu()
+				choice = selection_prompt()
+				
+			elif((choice == "q") or (choice == "Q")):
+				break
+			else:
+				print("Invalid choice!")
+				holes_search_menu()
+				choice = selection_prompt()
 		
-		#Round transparency to nearest hundreth
-		transparency = round((float(holes_num)/(self.active_encryption_object.n -1))*100, 2)
-		print("***** Results *****: ")
-		print("Septuple: ", self.active_encryption_object.get_septuple())
-		print("Holes found: ", holes_num, " Transparency: ", transparency, "%")
-		print()
+		return
+		
+		
+		
+
 
 	def output_results(self):
 		print("Result output and visualization selected")
@@ -370,6 +398,8 @@ class RSA_sandbox():
 	
 	
 	def help_topics(self):
+		help_menu()
+		choice = selection_prompt()
 		print("Help topics selected")
 		
 	def search_septuple(self, rsa_object):
