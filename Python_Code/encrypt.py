@@ -1,7 +1,13 @@
-#Program: This file implements the RSA python encyrption object code
-#Author: Aron Schwartz
-#Last edit: 12/9/2019
-
+#********************************************************
+#*                                                  
+#* File:        encrypt.py
+#* Description: Implements the RSA encryption algorithm as a 
+#* 				python class.  
+#*
+#* Author: Aron Schwartz
+#* Last Edit: 2/2/2020
+#*
+#********************************************************
 
 from math import gcd as bltin_gcd
 import random
@@ -12,42 +18,41 @@ import time
 def check_coprimality(a, b):
     return bltin_gcd(a, b) == 1
 
-#Encryption object
+#Define the RSA encryption object
 class encryption_set():
 
-	#Need P and Q at minimum to initialize the object
+	#Initialization function accepts, at minimum, the p and q values.  Allows customization or automatic generation of other variables
 	def __init__(self, p, q, custom_e=None, custom_d=None, custom_k =None):
-		#Assign p, q, n, and totient
+		#Assign the P and Q values
 		self.p = p
 		self.q = q
+		
+		#Assign the n value, which is the product of P and Q
 		self.n = p*q
+		
+		#Assign the totient value
 		self.totient = self.generate_totient(p, q)
 		
-		self.valid_e_list =[]
-		#Debug mode default to false
+		#Debug mode is false as the default
 		self.debug = False
 			
-		#Make randomly valid keys if none are passed in, otherwise set the the specified value
+		#If no e value is specified, generate a valid one
 		if (custom_e == None):
 			self.e = self.generate_random_valid_e()
+		#Otherwise set the e value to the custom value that was passed in
 		else:
 			self.e = custom_e
+		
+		#If no d value is passed in, generate a valid one
 		if (custom_d == None):
 			self.d = self.generate_random_valid_d()
+		#Otherwise set the d value to the custom value that was passed in
 		else:
 			self.d = custom_d
 			
 		#Set the k if a custom one is passed, otherwise it will be generated when we create a valid d
 		if custom_k != None:
 			self.k = custom_k
-	
-	#Function to make a list of all valid E from 2 to N
-	def generate_all_possible_e(self):
-		if (self.debug == True):
-			print("Generating all possible e-values")
-		for i in range(2, self.n):
-			if (check_coprimality(self.totient, i)):
-				self.valid_e_list.append(i)
 		
 	#Function to generate all D/K combinations
 	def generate_all_d_k_combinations(self, temp_e):
@@ -79,6 +84,12 @@ class encryption_set():
 		if (self.debug == True):
 			print("Generated e: ", str(rand_num))
 		return rand_num	
+	
+	#Function to swap out the E value for use in the RSA sandbox
+	def swap_out_e_value(self, new_e_value):
+		self.e = new_e_value
+		self.d = self.generate_random_valid_d()   #Generate a new d value based on the new e value
+		return
 	
 	#Function to generate a valid D
 	def generate_random_valid_d(self):
@@ -119,13 +130,11 @@ class encryption_set():
 		
 		return pow(val, self.e, self.n)
 		
-	
 	#Function to decrypt an int and return the plain-value
 	def decrypt_int(self, val):
 		if (self.debug == True):
 			print("Decrypting int: ", val)
 		return pow(val, self.d, self.n)
-		
 	
 	#Function to dump out internal variables for the encryption object
 	def to_String(self):
@@ -147,7 +156,8 @@ class encryption_set():
 	#Functions to enable or disable debug printing
 	def enable_debug_mode(self):
 		self.debug = True
-		
+	
+	#Function to disable debug mode
 	def disable_debug_mode(self):
 		self.debug = False
 	
@@ -155,6 +165,7 @@ class encryption_set():
 	def get_n(self):
 		return self.n
 	
+	#Function to fetch e
 	def get_e(self):
 		return self.e
 	
@@ -162,5 +173,3 @@ class encryption_set():
 	def get_septuple(self):
 		return [self.p, self.q, self.n, self.totient, self.e, self.k, self.d]
 	
-	def to_list(self):
-		return [self.p, self.q, self.n, self.totient, self.e, self.d, self.k]
