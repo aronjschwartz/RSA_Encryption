@@ -6,21 +6,29 @@
 #* strength with regards to fixed point occurence.
 #*
 #* Author: Aron Schwartz
-#* Last Edit: 1/26/2020
+#* Last Edit: 2/2/2020
 #*
 #********************************************************
 
+#Import all required libraries
 from encrypt import encryption_set
 from menus_prompts import *
 from encryption_test import *
 from save_load import *
-from configparser import ConfigParser
+from help import *
 import time
 import math
-	
+
 class RSA_sandbox():
 	
+	#************************************
+	#									*
+	#            Init function     		*
+	#									*
+	#************************************
+
 	def __init__(self):
+		#Internal data
 		self.plain_text = None
 		self.active_encryption_object = None
 		self.encryption_objects = []
@@ -30,7 +38,12 @@ class RSA_sandbox():
 		self.welcome_message()
 		self.display_main_menu()
 		
-	#Menu and prompt functions
+	#************************************
+	#									*
+	#        Menu calling functions    	*
+	#									*
+	#************************************
+	
 	def display_main_menu(self):
 		display_main_menu()
 		
@@ -48,7 +61,13 @@ class RSA_sandbox():
 	
 	def welcome_message(self):
 		welcome_message()
-		
+	
+	#************************************
+	#									*
+	#      Prompt calling functions    	*
+	#									*
+	#************************************
+	
 	def main_menu_selection_prompt(self):
 		selection = main_menu_selection_prompt()
 		return selection
@@ -56,6 +75,14 @@ class RSA_sandbox():
 	def selection_prompt(self):
 		selection = selection_prompt()
 		return selection
+	
+	
+	#************************************************************************************
+	#																					*
+	#  save_data(): Obtains a folder name from user and saves all system data to 		*
+	#               directory with provided the input name								*
+	#																					*
+	#************************************************************************************
 	
 	def save_data(self):
 		#Get folder name to save data from the user
@@ -70,7 +97,13 @@ class RSA_sandbox():
 		
 		print("Save Complete")
 		return
-		
+	
+	#************************************************************************************
+	#																					*
+	#  load_data(): Loads system data from a folder name provided from user input		*
+	#																					*
+	#************************************************************************************
+	
 	def load_data(self):
 		folder_name = input("Enter folder name (Ex: Arons_Settings): ")
 		if os.path.isdir("./" + str(folder_name)):
@@ -83,7 +116,13 @@ class RSA_sandbox():
 		else:
 			print("Folder '", str(folder_name), "' does not exist! Data load failed")
 		return
-		
+	
+	#*************************************************************************************************
+	#																								 *
+	#  system_data_management(): Handles various options related to saving and loading system data   *
+	#																								 *
+	#*************************************************************************************************
+	
 	def system_data_management(self):
 		system_data_menu()
 		choice = selection_prompt()
@@ -103,7 +142,14 @@ class RSA_sandbox():
 				system_data_menu()
 				choice = selection_prompt()
 		return
-		
+	
+	#************************************************************************************
+	#																					*
+	#  display_system_data(): Displays all septuples, encryption keys, and prime number *
+	#						  data currently loaded in the program     					*
+	#																					*
+	#************************************************************************************
+	
 	def display_system_data(self):
 		#Septuples with keys, tabbed output
 		count = 1
@@ -122,7 +168,13 @@ class RSA_sandbox():
 		
 		
 	
-	#Borrowed from provided code from Professor Shirley (ElementalNumberTheory.py)
+	#***************************************************************************************************
+	#																								   *
+	#  primes(): Generates a list of primes in a given range utilizing the sieve of erasthones method  *
+	#  Original Author: Professor Glenn Shirley, PSU												   *
+	#																								   *
+	#***************************************************************************************************
+	
 	def primes(self, lower_bound, upper_bound):
 		if upper_bound <= 1:
 			return []
@@ -137,7 +189,14 @@ class RSA_sandbox():
 			P.append(p)                                             # (6)
 			X = [a for a in X if a % p != 0]                        # (7)
 		return P + X                                                # (8)
-
+	
+	#************************************************************************************
+	#																					*
+	#  create_septuple_user_input(): Creates a septuple from user input.  Allows for    *
+	#                                selection of primes and e value					*
+	#																					*
+	#************************************************************************************
+	
 	def create_septuple_user_input(self):
 		if len(self.prime_list) == 0:
 			print("No primes list loaded")
@@ -156,6 +215,14 @@ class RSA_sandbox():
 		self.add_key_to_septuple(septuple_object, septuple_object.get_e())
 		print()
 		return septuple_object
+	
+	
+	#****************************************************************************************
+	#																						*
+	#  encryption_decryption_no_padding(): Allows for encyryption of strings or plaintext   *
+	#									   using system data without using padding 			*
+	#																						*
+	#****************************************************************************************
 	
 	def encryption_decryption_no_padding(self):
 		print("Encrypt/Decrypt without padding selected")
@@ -205,16 +272,35 @@ class RSA_sandbox():
 			print("\nCipher text: ", cipher_text)
 			print("\nDecrypted cipher text: ", decrypted_cipher_text)
 			print()
-				
+	
+
+	#****************************************************************************************
+	#																						*
+	#  encryption_decryption_no_padding(): Allows for encyryption of strings or plaintext   *
+	#									   using system data with padding enabled 			*
+	#																						*
+	#****************************************************************************************
+	
 	def encrypt_padding(self):
 		print("Encryption with padding selected")
 	
+	#*********************************************************************************************
+	#																							 *
+	#  show_keys_for_septuple(): Displays all keys loaded in system data for a given septuple    *
+	#																							 *
+	#*********************************************************************************************
 	
 	def show_keys_for_septuple(self, septuple):
 		print("\n****Displaying keys for septuple ", septuple.get_septuple(), " *****")
 		for encryption_key in self.encryption_keys[septuple]:
 			print("(", septuple.get_n(), ",",encryption_key, ")")
 		return
+	
+	#*********************************************************************************************
+	#																							 *
+	#  add_key_to_septuple(): Appends a key to a given septuple in the system data dictionary    *
+	#																							 *
+	#*********************************************************************************************
 	
 	def add_key_to_septuple(self, septuple, key):
 		if septuple not in self.encryption_keys:
@@ -227,9 +313,13 @@ class RSA_sandbox():
 			print("Key ", str(key), " appended to septuple ", str(septuple.get_septuple()))
 		return
 	
+	#****************************************************************
+	#																*
+	#  manage_keys(): Handles the key management functionality	    *
+	#																*
+	#****************************************************************
 	
-	
-	def generate_keys(self):  
+	def manage_keys(self):  
 		print("Key generation selected")
 		self.key_generation_menu()
 		choice = selection_prompt()
@@ -246,15 +336,24 @@ class RSA_sandbox():
 					self.add_key_to_septuple(self.encryption_objects[int(choice)], int(e_choice))
 					self.key_generation_menu()
 					choice = selection_prompt()
+			#Swap keys
+			elif (choice == "2"):
+				if (len(self.encryption_objects) == 0):
+					print("No septuples loaded!")
+					self.key_generation_menu()
+					choice = selection_prompt()
+				else:
+					self.view_septuples()
+					choice = input("Select septuple to swap key: ")
 					
 				
 				
-			elif (choice == "2"):
+			elif (choice == "3"):
 				#Clear keys
 				print("Clear keys")
 				self.key_generation_menu()
 				choice = selection_prompt()
-			elif (choice == "3"):
+			elif (choice == "4"):
 				self.view_septuples()
 				choice = input("Select septuple to view keys: ")
 				self.show_keys_for_septuple(self.encryption_objects[int(choice)])
@@ -262,8 +361,15 @@ class RSA_sandbox():
 				choice = selection_prompt()
 			elif ((choice == "q") or (choice == "Q")):
 				break
-
-	def generate_primes(self):
+	
+	
+	#*************************************************************************
+	#																		 *
+	#  manage_primes(): Handles the prime number management functionality	 *
+	#																		 *
+	#*************************************************************************
+	
+	def manage_primes(self):
 		print("Prime number generation selected...")
 		self.primes_selection_menu()
 		while(1):
@@ -295,8 +401,15 @@ class RSA_sandbox():
 				self.primes_selection_menu()
 				choice = self.selection_prompt()
 		return
-
-	def hole_search(self):
+	
+	
+	#****************************************************************
+	#																*
+	#  analyze_holes(): Handles the hole analysis functionality	 	*
+	#															    *
+	#****************************************************************
+	
+	def analyze_holes(self):
 		holes_search_menu()
 		choice = selection_prompt()
 		while(1):
@@ -334,11 +447,17 @@ class RSA_sandbox():
 		
 		
 		
-
+	
 
 	def output_results(self):
 		print("Result output and visualization selected")
 	
+	#************************************************************************************
+	#																					*
+	#  view_septuples(): Displays all septuples loaded innto system data, as well as    *
+	#					 information regarding the active septuple						*
+	#															    					*
+	#************************************************************************************
 	
 	def view_septuples(self):
 		print("*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
@@ -348,7 +467,14 @@ class RSA_sandbox():
 			else:
 				print(index, " - ", str(object.get_septuple()))
 	
-	def specify_septuples(self):
+		
+	#*************************************************************************
+	#																		 *
+	#  manage_septuples():  Handles the septuple management functionality 	 *
+	#															    	     *
+	#*************************************************************************
+	
+	def manage_septuples(self):
 		print("Specify septuples selected")
 		self.view_septuples()
 		self.septuple_selection_menu()
@@ -388,19 +514,55 @@ class RSA_sandbox():
 		return
 		
 		
-	def analyze_septuple(self):	
+	def analyze_septuples(self):	
 		print("Analyze septuple selected")
 		
 	def set_plaintext(self):
 		print("Plaintext customization selected")
 	
 	
-	
+	#******************************************************************************************
+	#																		 				  *
+	#  help_topics():  Allows user to obtain information regarding all program capabilities   *
+	#															    	     				  *
+	#******************************************************************************************
 	
 	def help_topics(self):
-		help_menu()
-		choice = selection_prompt()
 		print("Help topics selected")
+		while(1):
+			help_menu()
+			choice = selection_prompt()
+			if (choice == "1"):
+				encryption_decryption_no_padding_help()
+			elif(choice == "2"):
+				encryption_padding_help()
+			elif(choice == "3"):
+				manage_keys_help()
+			elif(choice == "4"):
+				manage_primes_help()
+			elif(choice == "5"):
+				analyze_holes_help()
+			elif(choice == "6"):
+				output_results_help()
+			elif(choice == "7"):
+				manage_septuples_help()
+			elif(choice == "8"):
+				plaintext_selection_help()
+			elif(choice == "9"):
+				print("Ciphertext help selected")
+			elif(choice == "10"):
+				display_system_data_help()
+			elif(choice == "11"):
+				save_load_data_help()
+			elif(choice == "12"):
+				RSA_Sandbox_overview()
+			elif((choice == "q") or (choice == "Q")):
+				break
+			else:
+				print("Invalid choice!")
+		return
+		
+		
 		
 	def search_septuple(self, rsa_object):
 		#Hole counter
@@ -414,7 +576,16 @@ class RSA_sandbox():
 				break
 		return holes
 
-	#Primary program loop
+	
+		
+	
+	#*************************************************************************************************
+	#																		 				  		 *
+	#  run():  Top level function that runs the RSA sandbox program.  Displays all program options	 *
+	#  		   and dictates program flow															 *
+	#															    	     				  		 *
+	#*************************************************************************************************
+	
 	def run(self):
 		while(1):
 			choice = self.main_menu_selection_prompt()
@@ -423,24 +594,22 @@ class RSA_sandbox():
 			elif(choice == "2"):
 				self.encrypt_padding()
 			elif(choice == "3"):
-				self.generate_keys()
+				self.manage_keys()
 			elif(choice == "4"):
-				self.generate_primes()
+				self.manage_primes()
 			elif(choice == "5"):
-				self.hole_search()
+				self.analyze_holes()
 			elif(choice == "6"):
 				self.output_results()
 			elif(choice == "7"):
-				self.specify_septuples()
+				self.manage_septuples()			
 			elif(choice == "8"):
-				self.analyze_septuple()			
-			elif(choice == "9"):
 				self.set_plaintext()
-			elif(choice == "10"):
+			elif(choice == "9"):
 				print("Ciphertext choice selected")
-			elif(choice == "11"):
+			elif(choice == "10"):
 				self.display_system_data()
-			elif(choice == "12"):
+			elif(choice == "11"):
 				self.system_data_management()
 			elif((choice == "M") or (choice == "m")):
 				self.display_main_menu()
@@ -451,7 +620,8 @@ class RSA_sandbox():
 				break
 			else:
 				print("Invalid input! Please choose from menu")
-
-
+		return
+		
+#Run the program
 sandbox = RSA_sandbox()
 sandbox.run()
