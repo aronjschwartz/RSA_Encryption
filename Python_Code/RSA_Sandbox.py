@@ -18,6 +18,7 @@ from save_load import *
 from help import *
 import time
 import math
+import shutil
 
 class RSA_sandbox():
 	
@@ -87,6 +88,9 @@ class RSA_sandbox():
 	def save_data(self):
 		#Get folder name to save data from the user
 		folder_name = input("Enter folder name (Ex: Arons_Settings): ")
+		#If folder already exists, remove it so we can overwrite
+		if os.path.exists("./" + str(folder_name)):
+			shutil.rmtree("./" + str(folder_name))
 		os.mkdir(folder_name)
 		save_encryption_objects(folder_name, self.encryption_objects)
 		save_key_data(folder_name, self.encryption_keys)
@@ -154,10 +158,7 @@ class RSA_sandbox():
 		#Septuples with keys, tabbed output
 		count = 1
 		print("******* Septuples and keys ********")
-		for key, value in self.encryption_keys.items():
-			print(str(count), " - ", key.get_septuple())
-			for encryption_key in value:
-				print("\t", "(", str(key.get_n()), ",", str(encryption_key), ")")
+		self.view_septuples()
 		#Primes
 		print("************ Primes *************")
 		if len(self.prime_list) > 0:
@@ -242,6 +243,13 @@ class RSA_sandbox():
 		
 		if (choice == "1"):
 			print("Encrypting plain text...")
+			file_name = input("Enter file name: ")
+			
+			if os.path.isfile("./plaintext_data/" + str(file_name)):
+				print("File found!")
+			else:
+				print("NOt found")
+			
 		elif (choice == "2"):
 			plain_text_ascii = []
 			cipher_ascii = []
@@ -460,14 +468,14 @@ class RSA_sandbox():
 	#************************************************************************************
 	
 	def view_septuples(self):
-		print("*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
+		print("\n*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
 		for index, object in enumerate(self.encryption_objects):
-			if (self.active_encryption_object == object):
-				print(index, " - ", str(object.get_septuple()) + "*** active ***")
+			if (self.active_encryption_object.get_septuple() == object.get_septuple()):
+				print(index, " - ", str(object.get_septuple()) + " *** active ***")
 			else:
 				print(index, " - ", str(object.get_septuple()))
 	
-		
+		print()
 	#*************************************************************************
 	#																		 *
 	#  manage_septuples():  Handles the septuple management functionality 	 *
@@ -518,7 +526,8 @@ class RSA_sandbox():
 		print("Analyze septuple selected")
 		
 	def set_plaintext(self):
-		print("Plaintext customization selected")
+		plaintext_management_menu()
+		choice = selection_prompt()
 	
 	
 	#******************************************************************************************

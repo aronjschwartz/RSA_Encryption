@@ -112,6 +112,13 @@ def key_generation_menu():
 	print("Q - Return to main menu\n")
 	return 
 
+def plaintext_management_menu():
+	print("\n\n******** PLAINTEXT MANAGEMENT MENU ********\n")
+	print("1 - Load plaintext")
+	print("2 - Enter plaintext manually")
+	print("3 - Clear plaintext")
+	print("Q - Return to main menu\n")
+
 def welcome_message():
 	print("*********************************************************")
 	print("*                                                       *")
