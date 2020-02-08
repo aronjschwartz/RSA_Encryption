@@ -85,11 +85,15 @@ class encryption_set():
 			print("Generated e: ", str(rand_num))
 		return rand_num	
 	
+	def verify_e_swap(self, new_e_value):
+		if check_coprimality(self.totient, new_e_value):
+			return True
+		return False
 	#Function to swap out the E value for use in the RSA sandbox
 	def swap_out_e_value(self, new_e_value):
 		self.e = new_e_value
 		self.d = self.generate_random_valid_d()   #Generate a new d value based on the new e value
-		return
+		return 
 	
 	#Function to generate a valid D
 	def generate_random_valid_d(self):
@@ -164,6 +168,15 @@ class encryption_set():
 	#Function to fetch N
 	def get_n(self):
 		return self.n
+	
+	#Function to fetch P
+	def get_p(self):
+		return self.p
+		
+	#Function to fetch Q
+	def get_q(self):
+		return self.q
+	
 	
 	#Function to fetch e
 	def get_e(self):

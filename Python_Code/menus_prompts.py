@@ -35,7 +35,7 @@ def display_main_menu():
 	print("2  - Encrypt with padding")
 	print("3  - Manage Keys")
 	print("4  - Manage Prime Numbers")
-	print("5  - Analyze Holes")
+	print("5  - Analyze Fixed Points")
 	print("6  - Output Results")
 	print("7  - Manage Septuples")
 	print("8  - Plaintext Message Selection")

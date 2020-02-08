@@ -32,7 +32,6 @@ def save_primes_data(folder_name, data):
 def save_key_data(folder_name, data):
 	#Save the key data
 	with open("./" + str(folder_name) + "/key_data", 'wb') as f:
-		print("Saving encryption key data...")
 		pickle.dump(data, f)
 		f.close()
 	return

@@ -93,6 +93,7 @@ class RSA_sandbox():
 			shutil.rmtree("./" + str(folder_name))
 		os.mkdir(folder_name)
 		save_encryption_objects(folder_name, self.encryption_objects)
+		print("HIgh level: ", self.encryption_keys)
 		save_key_data(folder_name, self.encryption_keys)
 		save_primes_data(folder_name, self.prime_list)
 		save_active_object_data(folder_name, self.active_encryption_object)
@@ -157,17 +158,50 @@ class RSA_sandbox():
 	def display_system_data(self):
 		#Septuples with keys, tabbed output
 		count = 1
-		print("******* Septuples and keys ********")
-		self.view_septuples()
+		print("******* DISPLAYING SYSTEM DATA ********")
+		self.view_septuples_with_keys()
 		#Primes
 		print("************ Primes *************")
 		if len(self.prime_list) > 0:
 			first_last = [self.prime_list[0], self.prime_list[-1]]
 			print("All primes between: ", str(first_last))
+			print()
 		return
 		
+	#************************************************************************************
+	#																					*
+	#  view_septuples(): Displays all septuples loaded innto system data, as well as    *
+	#					 information regarding the active septuple						*
+	#															    					*
+	#************************************************************************************
+	
+	def view_septuples(self):
+		print("\n*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
+		for index, object in enumerate(self.encryption_objects):
+			if (self.active_encryption_object.get_septuple() == object.get_septuple()):
+				print(index, " - ", str(object.get_septuple()) + " *** active ***")
+			else:
+				print(index, " - ", str(object.get_septuple()))
+		print()
 		
-		
+	#***********************************************************************************************
+	#																							   *
+	#  view_septuples_with_keys(): Displays all septuples loaded innto system data, as well as     *
+	#					 information regarding the active septuple and all keys for each septuple  *
+	#															    					           *
+	#***********************************************************************************************
+	
+	def view_septuples_with_keys(self):
+		print("\n*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
+		for index, object in enumerate(self.encryption_objects):
+			if (self.active_encryption_object.get_septuple() == object.get_septuple()):
+				print(index, " - ", str(object.get_septuple()) + " *** active ***")
+				self.show_keys_for_septuple(object)
+			else:
+				print(index, " - ", str(object.get_septuple()))
+				self.show_keys_for_septuple(object)
+		print()
+	
 	
 	#***************************************************************************************************
 	#																								   *
@@ -214,6 +248,10 @@ class RSA_sandbox():
 		septuple_object.to_String()
 		
 		self.add_key_to_septuple(septuple_object, septuple_object.get_e())
+		
+		
+		if self.active_encryption_object is None:
+			self.active_encryption_object = septuple_object
 		print()
 		return septuple_object
 	
@@ -299,10 +337,13 @@ class RSA_sandbox():
 	#*********************************************************************************************
 	
 	def show_keys_for_septuple(self, septuple):
-		print("\n****Displaying keys for septuple ", septuple.get_septuple(), " *****")
-		for encryption_key in self.encryption_keys[septuple]:
-			print("(", septuple.get_n(), ",",encryption_key, ")")
+		for key, value in self.encryption_keys.items():
+			if key.get_septuple() == septuple.get_septuple():
+				for encryption_key in self.encryption_keys[key]:
+					print("(", key.get_n(), ",",encryption_key, ")")
 		return
+	
+	
 	
 	#*********************************************************************************************
 	#																							 *
@@ -352,10 +393,49 @@ class RSA_sandbox():
 					choice = selection_prompt()
 				else:
 					self.view_septuples()
-					choice = input("Select septuple to swap key: ")
-					
-				
-				
+					sept_choice = input("Select septuple to swap key: ")
+					self.show_keys_for_septuple(self.encryption_objects[int(sept_choice)])
+					key_choice = selection_prompt()
+					old_septuple = self.encryption_objects[int(sept_choice)]
+					print("Original old sept: ", old_septuple.get_septuple())
+					found = False
+					for key, value in self.encryption_keys.items():
+						for encryption_key in value:
+							#Key exists, dont need to add to the dictionary.  Just swap out in septuple list, and replace in the key dictionary
+							if int(key_choice) == encryption_key:
+								print("Key already exists, swapping...")
+								#Check that the e value meets coprimality
+								if(self.encryption_objects[int(sept_choice)].verify_e_swap(int(key_choice)) == True):
+									new_sept = encrypt.encryption_set(old_septuple.get_p(), old_septuple.get_q(), int(key_choice))
+									#Replace the old septuple with the new one in the encryption object list
+									print("Before removal: ")
+									self.view_septuples()
+									self.encryption_objects.remove(old_septuple)
+									self.encryption_objects.append(new_sept)
+									
+									#TODO: If the old sept was the active, make the new one the active
+									print("After removal: ")
+									self.view_septuples()
+									
+									self.encryption_keys[new_sept] = self.encryption_keys[old_septuple]
+									del self.encryption_keys[old_septuple]
+									self.encryption_objects[int(sept_choice)].swap_out_e_value(int(key_choice))
+									print("Success!")
+									#Replace old key with new one, since e changed
+									print("Old sept: ", old_septuple.get_septuple())
+		
+									found = True
+								break
+						if(found == False):
+							print("Key doesnt exist, adding to data and swapping...")
+							if (self.encryption_objects[int(sept_choice)].swap_out_e_value(int(key_choice)) == True):
+								self.add_key_to_septuple(self.encryption_objects[int(sept_choice)], int(key_choice))
+								self.encryption_keys[self.encryption_objects[int(sept_choice)]] = self.encryption_keys[old_septuple]
+								del self.encryption_keys[old_septuple]
+								print("Success!")
+				self.key_generation_menu()
+				choice = selection_prompt()
+						
 			elif (choice == "3"):
 				#Clear keys
 				print("Clear keys")
@@ -370,6 +450,11 @@ class RSA_sandbox():
 			elif ((choice == "q") or (choice == "Q")):
 				break
 	
+	
+	
+	def show_key_list(self):
+		for key, value in self.encryption_keys.items():
+			print("Key: ", key.get_septuple(), " Value: ", value)
 	
 	#*************************************************************************
 	#																		 *
@@ -453,29 +538,10 @@ class RSA_sandbox():
 		
 		return
 		
-		
-		
-	
-
 	def output_results(self):
 		print("Result output and visualization selected")
 	
-	#************************************************************************************
-	#																					*
-	#  view_septuples(): Displays all septuples loaded innto system data, as well as    *
-	#					 information regarding the active septuple						*
-	#															    					*
-	#************************************************************************************
-	
-	def view_septuples(self):
-		print("\n*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
-		for index, object in enumerate(self.encryption_objects):
-			if (self.active_encryption_object.get_septuple() == object.get_septuple()):
-				print(index, " - ", str(object.get_septuple()) + " *** active ***")
-			else:
-				print(index, " - ", str(object.get_septuple()))
-	
-		print()
+
 	#*************************************************************************
 	#																		 *
 	#  manage_septuples():  Handles the septuple management functionality 	 *
