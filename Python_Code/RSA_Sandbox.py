@@ -397,7 +397,6 @@ class RSA_sandbox():
 					self.show_keys_for_septuple(self.encryption_objects[int(sept_choice)])
 					key_choice = selection_prompt()
 					old_septuple = self.encryption_objects[int(sept_choice)]
-					print("Original old sept: ", old_septuple.get_septuple())
 					found = False
 					for key, value in self.encryption_keys.items():
 						for encryption_key in value:
@@ -408,31 +407,36 @@ class RSA_sandbox():
 								if(self.encryption_objects[int(sept_choice)].verify_e_swap(int(key_choice)) == True):
 									new_sept = encrypt.encryption_set(old_septuple.get_p(), old_septuple.get_q(), int(key_choice))
 									#Replace the old septuple with the new one in the encryption object list
-									print("Before removal: ")
-									self.view_septuples()
-									self.encryption_objects.remove(old_septuple)
-									self.encryption_objects.append(new_sept)
 									
-									#TODO: If the old sept was the active, make the new one the active
-									print("After removal: ")
-									self.view_septuples()
+									for index, septuple in enumerate(self.encryption_objects):
+										if septuple.get_septuple() == old_septuple.get_septuple():
+											self.encryption_objects[index] = new_sept
 									
-									self.encryption_keys[new_sept] = self.encryption_keys[old_septuple]
-									del self.encryption_keys[old_septuple]
+								
+									for key, value in self.encryption_keys.items():
+										if key.get_septuple() == old_septuple.get_septuple():
+											self.encryption_keys[new_sept] = self.encryption_keys[key]
+											del self.encryption_keys[key]
+											break
 									self.encryption_objects[int(sept_choice)].swap_out_e_value(int(key_choice))
 									print("Success!")
-									#Replace old key with new one, since e changed
-									print("Old sept: ", old_septuple.get_septuple())
-		
-									found = True
+									
+									#If the old sept was the active, make the new one the active
+									if (self.active_encryption_object.get_septuple() == old_septuple.get_septuple()):
+										self.active_encryption_object = new_sept
+								found = True
 								break
-						if(found == False):
-							print("Key doesnt exist, adding to data and swapping...")
-							if (self.encryption_objects[int(sept_choice)].swap_out_e_value(int(key_choice)) == True):
-								self.add_key_to_septuple(self.encryption_objects[int(sept_choice)], int(key_choice))
-								self.encryption_keys[self.encryption_objects[int(sept_choice)]] = self.encryption_keys[old_septuple]
-								del self.encryption_keys[old_septuple]
-								print("Success!")
+						if found == True:
+							break
+					if(found == False):
+						print("Key doesnt exist, adding to data and swapping...")
+						if (self.encryption_objects[int(sept_choice)].swap_out_e_value(int(key_choice)) == True):
+							self.add_key_to_septuple(self.encryption_objects[int(sept_choice)], int(key_choice))
+							self.encryption_keys[self.encryption_objects[int(sept_choice)]] = self.encryption_keys[old_septuple]
+							del self.encryption_keys[old_septuple]
+							print("Success!")
+				print("THE KEY LIST IS: ")
+				self.show_key_list()	
 				self.key_generation_menu()
 				choice = selection_prompt()
 						
