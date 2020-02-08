@@ -500,6 +500,11 @@ class RSA_sandbox():
 		return
 	
 	
+	
+	def format_results(self, septuple, holes_num, transparency):
+		result_string = "Septuple: " + str(septuple) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
+		return result_string
+		
 	#****************************************************************
 	#																*
 	#  analyze_holes(): Handles the hole analysis functionality	 	*
@@ -510,23 +515,53 @@ class RSA_sandbox():
 		holes_search_menu()
 		choice = selection_prompt()
 		while(1):
+			#Analyze the active septuple
 			if(choice == "1"):
-				print("Hole search selected, analyzing the active septuple ", self.active_encryption_object.get_septuple())
+				if self.active_encryption_object is None:
+					choice = input("No object loaded! Create one? [Y/N]: ")
+					if ((choice == "y") or (choice == "Y")):
+						septuple = self.create_septuple_user_input()
+						self.encryption_objects.append(septuple)
+				
+						if len(self.encryption_objects) == 1:
+							self.active_encryption_object = septuple
+					else:
+						print("Returning to main menu")
+						break
+				print("Analyzing active septuple: ", self.active_encryption_object.get_septuple())
 				#Analyze the holes in the septuple
 				holes_num = self.active_encryption_object.search_holes()
 				
 				#Round transparency to nearest hundreth
 				transparency = round((float(holes_num)/(self.active_encryption_object.n -1))*100, 2)
 				print("***** Results *****: ")
-				print("Septuple: ", self.active_encryption_object.get_septuple())
-				print("Holes found: ", holes_num, " Transparency: ", transparency, "%")
-				print()
+				print(self.format_results(self.active_encryption_object.get_septuple(), holes_num, transparency))
 				
 				holes_search_menu()
 				choice = selection_prompt()
-				
+			#Compare all septuples, display results sorted by transparency
 			elif(choice == "2"):
-				print("Compare all septuples")
+				results_list_unsorted = []
+				results_list_sorted = []
+				transparency_list = []
+				for septuple in self.encryption_objects:
+					#Analyze the holes in the septuple
+					holes_num = septuple.search_holes()
+					#Round transparency to nearest hundreth
+					transparency = round((float(holes_num)/(septuple.n -1))*100, 2)
+					result_string = self.format_results(septuple.get_septuple(), holes_num, transparency)
+					transparency_list.append(transparency)
+					results_list_unsorted.append(result_string)
+					
+				for value in sorted(transparency_list):
+					for result in results_list_unsorted:
+						if (str(value) == str(result[-5:])):
+							results_list_sorted.append(result)
+				print("*********** RANKED RESULTS **************")
+				for result in list(reversed(results_list_sorted)):
+					print(result, "%")
+							
+				
 				
 				
 				holes_search_menu()
@@ -572,6 +607,10 @@ class RSA_sandbox():
 				print("Creating septuple..")
 				septuple = self.create_septuple_user_input()
 				self.encryption_objects.append(septuple)
+				
+				if len(self.encryption_objects) == 1:
+					self.active_encryption_object = septuple
+				
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
 			elif (choice == "3"):
