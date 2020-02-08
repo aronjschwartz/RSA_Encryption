@@ -13,6 +13,8 @@ from math import gcd as bltin_gcd
 import random
 import math
 import time
+import json
+
 
 #Simple function to check for co-primality 
 def check_coprimality(a, b):
