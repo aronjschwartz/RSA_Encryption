@@ -91,16 +91,17 @@ class RSA_sandbox():
 		#If folder already exists, remove it so we can overwrite
 		if os.path.exists("./" + str(folder_name)):
 			shutil.rmtree("./" + str(folder_name))
+		#Make the folder
 		os.mkdir(folder_name)
+		#Call the function to save the encryption object data
 		save_encryption_objects(folder_name, self.encryption_objects)
-		print("HIgh level: ", self.encryption_keys)
 		save_key_data(folder_name, self.encryption_keys)
 		save_primes_data(folder_name, self.prime_list)
 		save_active_object_data(folder_name, self.active_encryption_object)
 		
 		#TODO: Implement plain text saving		
 		
-		print("Save Complete")
+		print("**** Save Successful! ****")
 		return
 	
 	#************************************************************************************
@@ -110,14 +111,18 @@ class RSA_sandbox():
 	#************************************************************************************
 	
 	def load_data(self):
+		#Get the folder name from the user
 		folder_name = input("Enter folder name (Ex: Arons_Settings): ")
+		#See if it exists
 		if os.path.isdir("./" + str(folder_name)):
 			print("Folder '", str(folder_name), "' found! Loading settings...")
+			#Call the load functions to reload system data
 			self.encryption_objects = load_encryption_objects(folder_name)
 			self.encryption_keys = load_key_data(folder_name)
 			self.prime_list = load_primes_data(folder_name)
 			self.active_encryption_object = load_active_object_data(folder_name)
 			print("Load Complete")
+		#Error message if folder not found
 		else:
 			print("Folder '", str(folder_name), "' does not exist! Data load failed")
 		return
@@ -129,19 +134,24 @@ class RSA_sandbox():
 	#*************************************************************************************************
 	
 	def system_data_management(self):
+		#Call the system data management menu
 		system_data_menu()
 		choice = selection_prompt()
 		while(1):
+			#Save data
 			if (choice == "1"):
 				self.save_data()
 				system_data_menu()
 				choice = selection_prompt()
+			#Load data
 			elif(choice == "2"):
 				self.load_data()
 				system_data_menu()
 				choice = selection_prompt()
+			#Quit to main menu
 			elif((choice == "q") or (choice == "Q")):
 				break
+			#Invalid otherwise, reprompt for valid choice
 			else:
 				print("Invalid choice!")
 				system_data_menu()
@@ -176,6 +186,7 @@ class RSA_sandbox():
 	#************************************************************************************
 	
 	def view_septuples(self):
+		#Loop through the septuple list and print, catch the active septuple and indicate with extra characters
 		print("\n*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
 		for index, object in enumerate(self.encryption_objects):
 			if (self.active_encryption_object.get_septuple() == object.get_septuple()):
@@ -541,29 +552,25 @@ class RSA_sandbox():
 				choice = selection_prompt()
 			#Compare all septuples, display results sorted by transparency
 			elif(choice == "2"):
-				results_list_unsorted = []
-				results_list_sorted = []
+				result_transparency_dict = {}
 				transparency_list = []
+				#Gather results for all the septuples
 				for septuple in self.encryption_objects:
 					#Analyze the holes in the septuple
 					holes_num = septuple.search_holes()
 					#Round transparency to nearest hundreth
 					transparency = round((float(holes_num)/(septuple.n -1))*100, 2)
 					result_string = self.format_results(septuple.get_septuple(), holes_num, transparency)
+					result_transparency_dict[transparency] = result_string
 					transparency_list.append(transparency)
-					results_list_unsorted.append(result_string)
-					
-				for value in sorted(transparency_list):
-					for result in results_list_unsorted:
-						if (str(value) == str(result[-5:])):
-							results_list_sorted.append(result)
-				print("*********** RANKED RESULTS **************")
-				for result in list(reversed(results_list_sorted)):
-					print(result, "%")
-							
 				
-				
-				
+				#Display the results sorted by transparency
+				print("\n\n*********** RANKED RESULTS **************")
+				for transparency in list(reversed(sorted(transparency_list))):
+					for key, value in result_transparency_dict.items():
+						if key == transparency:
+							print(value, "%")
+				print()
 				holes_search_menu()
 				choice = selection_prompt()
 				
