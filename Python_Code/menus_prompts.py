@@ -39,9 +39,8 @@ def display_main_menu():
 	print("6  - Output Results")
 	print("7  - Manage Septuples")
 	print("8  - Plaintext Message Selection")
-	print("9  - Specify Ciphertext")
-	print("10 - Display System Data")
-	print("11 - Save/Load System data")
+	print("9  - Display System Data")
+	print("10 - Save/Load System data")
 	print("M  - Reload main menu")
 	print("H  - Help Topics")
 	print("Q  - Exit program\n")
@@ -92,7 +91,8 @@ def primes_selection_menu():
 def holes_search_menu():
 	print("\n\n******** FIXED POINT ANALYSIS MENU ********\n")
 	print("1 - Analyze septuple")
-	print("2 - Compare all septuples")
+	print("2 - Compare septuples")
+	print("3 - Generate transparency profile")
 	print("Q - Return to main menu\n")
 	return
 	

@@ -511,10 +511,9 @@ class RSA_sandbox():
 		choice = selection_prompt()
 		while(1):
 			if(choice == "1"):
-				print("Analyze septuple")
 				print("Hole search selected, analyzing the active septuple ", self.active_encryption_object.get_septuple())
 				#Analyze the holes in the septuple
-				holes_num = self.search_septuple(self.active_encryption_object)
+				holes_num = self.active_encryption_object.search_holes()
 				
 				#Round transparency to nearest hundreth
 				transparency = round((float(holes_num)/(self.active_encryption_object.n -1))*100, 2)
@@ -641,22 +640,6 @@ class RSA_sandbox():
 				print("Invalid choice!")
 		return
 		
-		
-		
-	def search_septuple(self, rsa_object):
-		#Hole counter
-		holes = 0
-		count = 2
-		while(1):
-			if ((int(rsa_object.encrypt_int(count))) == count):
-				holes +=1
-			count +=1
-			if count == rsa_object.n-1:
-				break
-		return holes
-
-	
-		
 	
 	#*************************************************************************************************
 	#																		 				  		 *
@@ -685,10 +668,8 @@ class RSA_sandbox():
 			elif(choice == "8"):
 				self.set_plaintext()
 			elif(choice == "9"):
-				print("Ciphertext choice selected")
-			elif(choice == "10"):
 				self.display_system_data()
-			elif(choice == "11"):
+			elif(choice == "10"):
 				self.system_data_management()
 			elif((choice == "M") or (choice == "m")):
 				self.display_main_menu()

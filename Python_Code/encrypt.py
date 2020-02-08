@@ -142,6 +142,19 @@ class encryption_set():
 			print("Decrypting int: ", val)
 		return pow(val, self.d, self.n)
 	
+	def search_holes(self):
+		#Hole counter
+		holes = 0
+		count = 2
+		while(1):
+			if ((int(self.encrypt_int(count))) == count):
+				holes +=1
+			count +=1
+			if count == int((self.n)/2):
+				break
+		return holes*2
+	
+	
 	#Function to dump out internal variables for the encryption object
 	def to_String(self):
 		print("P: ", self.p)
