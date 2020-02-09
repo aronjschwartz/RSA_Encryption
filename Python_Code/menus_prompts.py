@@ -98,8 +98,11 @@ def holes_search_menu():
 	
 def system_data_menu():
 	print("\n\n******** SYSTEM DATA MANAGEMENT MENU ********\n")
-	print("1 - Save data")
-	print("2 - Load data")
+	print("1 - Save data to profile")
+	print("2 - Load data from profile")
+	print("3 - Load septuples")
+	print("4 - Load keys")
+	print("5 - Load plaintext")
 	print("Q - Return to main menu\n")
 	return
 	

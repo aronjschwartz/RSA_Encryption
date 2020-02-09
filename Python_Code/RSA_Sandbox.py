@@ -31,10 +31,13 @@ class RSA_sandbox():
 	def __init__(self):
 		#Internal data
 		self.plain_text = None
+		self.plain_text_file = None
+		self.cipher_text = None
+		self.cipher_text_file = None
 		self.active_encryption_object = None
 		self.encryption_objects = []
 		self.prime_list = []
-		self.encryption_keys = {} #Dict to associate with sept
+		self.encryption_keys = {} 
 		self.public_keys = [3, 5, 17, 257, 65537]
 		
 		if not os.path.exists("./Plaintext/"):
@@ -96,9 +99,9 @@ class RSA_sandbox():
 	#																					*
 	#************************************************************************************
 	
-	def save_data(self):
+	def save_data_profile(self):
 		#Get folder name to save data from the user
-		folder_name = input("Enter folder name (Ex: Arons_Settings): ")
+		folder_name = input("Enter profile folder name (Ex: Arons_Settings): ")
 		#If folder already exists, remove it so we can overwrite
 		if os.path.exists("./" + str(folder_name)):
 			shutil.rmtree("./" + str(folder_name))
@@ -121,9 +124,9 @@ class RSA_sandbox():
 	#																					*
 	#************************************************************************************
 	
-	def load_data(self):
+	def load_data_profile(self):
 		#Get the folder name from the user
-		folder_name = input("Enter folder name (Ex: Arons_Settings): ")
+		folder_name = input("Enter profile folder name (Ex: Arons_Settings): ")
 		#See if it exists
 		if os.path.isdir("./" + str(folder_name)):
 			print("Folder '", str(folder_name), "' found! Loading settings...")
@@ -132,7 +135,7 @@ class RSA_sandbox():
 			self.encryption_keys = load_key_data(folder_name)
 			self.prime_list = load_primes_data(folder_name)
 			self.active_encryption_object = load_active_object_data(folder_name)
-			print("Load Complete")
+			print("******** Load Successful! **********")
 		#Error message if folder not found
 		else:
 			print("Folder '", str(folder_name), "' does not exist! Data load failed")
@@ -149,14 +152,47 @@ class RSA_sandbox():
 		system_data_menu()
 		choice = selection_prompt()
 		while(1):
-			#Save data
+			#Save data to profile
 			if (choice == "1"):
-				self.save_data()
+				self.save_data_profile()
 				system_data_menu()
 				choice = selection_prompt()
-			#Load data
+			#Load data from profile
 			elif(choice == "2"):
-				self.load_data()
+				self.load_data_profile()
+				system_data_menu()
+				choice = selection_prompt()
+			#Load septuples
+			elif(choice == "3"):
+				print("Load septuples")
+				system_data_menu()
+				choice = selection_prompt()
+			#Load keys
+			elif(choice == "4"):
+				print("Load keys")
+				system_data_menu()
+				choice = selection_prompt()
+			#Load plaintext
+			elif(choice == "5"):
+				plaintext_folder = os.listdir("./Plaintext/")
+				if len(plaintext_folder) == 0:
+					print("Plaintext folder is empty!")
+				else:
+					for index, file in enumerate(plaintext_folder):
+						print(str(index), " - ", str(file))
+						choice = selection_prompt()
+						try:
+							self.plain_text_file = "./Plaintext/" + str(file)
+							with open(self.plain_text_file) as f:
+								self.plain_text = f.read()
+						
+						
+						except IndexError:
+							print("Invalid choice")
+							pass
+						
+						
+						
 				system_data_menu()
 				choice = selection_prompt()
 			#Quit to main menu
@@ -187,6 +223,9 @@ class RSA_sandbox():
 			first_last = [self.prime_list[0], self.prime_list[-1]]
 			print("All primes between: ", str(first_last))
 			print()
+		
+		print("Plaintext loaded from file: ", str(self.plain_text_file))
+		print()
 		return
 		
 	#************************************************************************************
@@ -278,6 +317,7 @@ class RSA_sandbox():
 		return septuple_object
 	
 	
+	
 	#****************************************************************************************
 	#																						*
 	#  encryption_decryption_no_padding(): Allows for encyryption of strings or plaintext   *
@@ -300,51 +340,65 @@ class RSA_sandbox():
 		#See what the user wants to encrypt
 		self.encryption_selection_menu()
 		choice = self.selection_prompt()
-		
-		if (choice == "1"):
-			print("Encrypting plain text...")
-			file_name = input("Enter file name: ")
-			
-			if os.path.isfile("./plaintext_data/" + str(file_name)):
-				print("File found!")
-			else:
-				print("NOt found")
-			
-		elif (choice == "2"):
-			plain_text_ascii = []
-			cipher_ascii = []
-			decrypted_cipher_ascii = []
-			decrypted_cipher_text = ""
-			plain_text_string = input("Enter string to encrypt: ")
-			#Obtain a list of ascii values for the plain text
-			plain_text_ascii = get_ascii_list(plain_text_string)
-
-			#Encrypt each number in the plain-text ascii list to obtain the cipher-ascii list
-			for i in plain_text_ascii:
-				cipher_ascii.append(int(self.active_encryption_object.encrypt_int(i)))
+		while(1):
+			#Encrypt the plaintext, if it exists
+			if (choice == "1"):
+				if self.plain_text is None:
+					print("No plaintext loaded!")
+				else:
+					break
 				
-			#Generate the cipher text from the cipher-ascii list
-			cipher_text = get_string_from_ascii(cipher_ascii)
-			
-			
-			#Decrypt the cipher-ascii.  This should result back to the original plain-ascii list
-			for i in cipher_ascii:
-				decrypted_cipher_ascii.append(self.active_encryption_object.decrypt_int(i))
-			
-			#Generate the plain-text from the plain-ascii
-			for i in decrypted_cipher_ascii:
-				decrypted_cipher_text += chr(int(i))
-			
-			#Display the original plain text, cipher text, and the decrypted_cipher_text (which should equal the plain text)
-			print("\n\nPlain text: ", plain_text_string)
-			print("\nCipher text: ", cipher_text)
-			print("\nDecrypted cipher text: ", decrypted_cipher_text)
-			print()
-	
+				
+				
+				
+				self.encryption_selection_menu()
+				choice = self.selection_prompt()
+			#Encrypt an input string from the user
+			elif (choice == "2"):
+				#Lists to hold values
+				plain_text_ascii = []
+				cipher_text_ascii = []
+				decrypted_cipher_ascii = []
+				
+				#Prompt the user to input a string to be encrypted
+				plain_text_string = input("Enter string to encrypt: ")
+				
+				#Converte the string to a list of equivalent ascii integers
+				plain_text_ascii = get_ascii_list(plain_text_string)
 
+				#Encrypt each number in the plain-text ascii list to obtain the cipher-ascii list
+				cipher_text_ascii = self.active_encryption_object.encrypt_int_list(plain_text_ascii)
+						
+				#Generate the cipher text string from the cipher-ascii list
+				cipher_text_string = get_string_from_ascii(cipher_text_ascii)
+				
+				decrypted_cipher_ascii= self.active_encryption_object.decrypt_int_list(cipher_text_ascii)
+				
+				#Generate the resulting string after decrypting the cipher text list 
+				decrypted_ciphertext_string = get_string_from_ascii(decrypted_cipher_ascii)
+				
+				#Display the original plain text, cipher text, and the decrypted_cipher_text (which should equal the plain text)
+				print("\n\nPlain text: ", plain_text_string)
+				print("\nCipher text: ", cipher_text_string)
+				print("\nDecrypted cipher text: ", decrypted_ciphertext_string)
+				print()
+		
+				self.encryption_selection_menu()
+				choice = self.selection_prompt()
+			elif((choice == "q") or (choice == "Q")):
+				break
+			else:
+				print("Invalid choice!")
+				self.encryption_selection_menu()
+				choice = self.selection_prompt()
+		return
+		
+			
+			
+			
 	#****************************************************************************************
 	#																						*
-	#  encryption_decryption_no_padding(): Allows for encyryption of strings or plaintext   *
+	#  encryp_padding(): Allows for encyryption of strings or plaintext   *
 	#									   using system data with padding enabled 			*
 	#																						*
 	#****************************************************************************************

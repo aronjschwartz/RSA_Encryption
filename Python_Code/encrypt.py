@@ -142,6 +142,21 @@ class encryption_set():
 			print("Decrypting int: ", val)
 		return pow(val, self.d, self.n)
 	
+	#Function to encrypt a list of integers
+	def encrypt_int_list(self, plaintext_list):
+		cipher_list = []
+		for i in plaintext_list:
+			cipher_list.append(self.encrypt_int(int(i)))
+		return cipher_list
+	
+	#Function to decrypt a list of integers
+	def decrypt_int_list(self, cipher_list):
+		plaintext_list = []
+		for i in cipher_list:
+			plaintext_list.append(self.decrypt_int(int(i)))
+		return plaintext_list
+	
+	#Function to search for all fixed points in the septuple
 	def search_holes(self):
 		#Hole counter
 		holes = 0
@@ -150,7 +165,7 @@ class encryption_set():
 			if ((int(self.encrypt_int(count))) == count):
 				holes +=1
 			count +=1
-			if count == int((self.n)/2):
+			if count == int((self.n)/2):   #Take advantage of symmetry for faster search, only search up to n/2 and double it
 				break
 		return holes*2
 	
