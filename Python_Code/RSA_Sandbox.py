@@ -346,7 +346,17 @@ class RSA_sandbox():
 				if self.plain_text is None:
 					print("No plaintext loaded!")
 				else:
-					break
+					print("Use active object? ", str(self.active_encryption_object.get_septuple()), "? [Y/N]: ")
+					choice = selection_prompt()
+					if((choice == "Y") or (choice == "y")):
+						self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
+						decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
+						print("The plain text is: ", self.plain_text)
+						print("The ciphertext is: ", get_string_from_ascii(self.cipher_text))
+						print("Decrypted: ", get_string_from_ascii(decrypted))
+						break
+					else:
+						print("Choose septuple")
 				
 				
 				
