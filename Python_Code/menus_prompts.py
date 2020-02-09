@@ -32,7 +32,7 @@ def selection_prompt():
 def display_main_menu():
 	print("\n\n************ MAIN MENU *************\n")
 	print("1  - Encrypt/Decrypt without padding")
-	print("2  - Encrypt with padding")
+	print("2  - Encrypt/Decrypt with padding")
 	print("3  - Manage Keys")
 	print("4  - Manage Prime Numbers")
 	print("5  - Analyze Fixed Points")

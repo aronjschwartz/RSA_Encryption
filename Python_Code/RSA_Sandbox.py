@@ -36,6 +36,17 @@ class RSA_sandbox():
 		self.prime_list = []
 		self.encryption_keys = {} #Dict to associate with sept
 		self.public_keys = [3, 5, 17, 257, 65537]
+		
+		if not os.path.exists("./Plaintext/"):
+			os.mkdir("./Plaintext/")
+		
+		if not os.path.exists("./Ciphertext/"):
+			os.mkdir("./Ciphertext/")
+		
+		if not os.path.exists("./Results/"):
+			os.mkdir("./Results/")
+		
+		
 		self.welcome_message()
 		self.display_main_menu()
 		
@@ -510,8 +521,10 @@ class RSA_sandbox():
 				choice = self.selection_prompt()
 		return
 	
-	
-	
+	def format_results_with_keys(self, septuple, holes_num, transparency):
+		result_string = "Septuple: " + str(septuple) + ", Key: " + str(septuple[4]) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
+		return result_string
+		
 	def format_results(self, septuple, holes_num, transparency):
 		result_string = "Septuple: " + str(septuple) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
 		return result_string
@@ -573,7 +586,39 @@ class RSA_sandbox():
 				print()
 				holes_search_menu()
 				choice = selection_prompt()
+			#Generate transparency profile
+			elif(choice == "3"):
+			
+				result_transparency_dict = {}
+				transparency_list = []
+			
+				for index, object in enumerate(self.encryption_objects):
+					print(str(index) + " - " + str(object.get_septuple()))
+				choice = input("Select septuple: ")
+				sept = self.encryption_objects[int(choice)]
+				for key, value in self.encryption_keys.items():
+					if key.get_septuple() == sept.get_septuple():
+						for encryption_key in value:
+							temp_sept = encrypt.encryption_set(p=sept.get_p(), q=sept.get_q(), custom_e=int(encryption_key))
+							holes_num = temp_sept.search_holes()
+							#Round transparency to nearest hundreth
+							transparency = round((float(holes_num)/(sept.n -1))*100, 2)
+							result_string = self.format_results_with_keys(temp_sept.get_septuple(), holes_num, transparency)
+							result_transparency_dict[transparency] = result_string
+							transparency_list.append(transparency)
 				
+				#Display the results sorted by transparency
+				print("\n\n*********** RANKED RESULTS **************")
+				for transparency in list(reversed(sorted(transparency_list))):
+					for key, value in result_transparency_dict.items():
+						if key == transparency:
+							print(value, "%")
+							
+				
+				holes_search_menu()
+				choice - selection_prompt()
+				
+			
 			elif((choice == "q") or (choice == "Q")):
 				break
 			else:
