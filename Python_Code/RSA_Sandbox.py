@@ -29,7 +29,7 @@ class RSA_sandbox():
 	#************************************
 
 	def __init__(self):
-		#Internal data
+		#Internal data variables
 		self.plain_text = None
 		self.plain_text_file = None
 		self.cipher_text = None
@@ -135,6 +135,12 @@ class RSA_sandbox():
 			self.encryption_keys = load_key_data(folder_name)
 			self.prime_list = load_primes_data(folder_name)
 			self.active_encryption_object = load_active_object_data(folder_name)
+			
+			#Load up keys for the loaded septuples, in case some were added manually.  This ensures each septuple has its key entered in the system dictionary
+			for septuple in self.encryption_objects:
+				self.add_key_to_septuple(septuple, septuple.get_e())
+			
+			
 			print("******** Load Successful! **********")
 		#Error message if folder not found
 		else:
@@ -749,7 +755,7 @@ class RSA_sandbox():
 	def analyze_septuples(self):	
 		print("Analyze septuple selected")
 		
-	def set_plaintext(self):
+	def manage_plaintext(self):
 		plaintext_management_menu()
 		choice = selection_prompt()
 	
@@ -770,24 +776,20 @@ class RSA_sandbox():
 			elif(choice == "2"):
 				encryption_padding_help()
 			elif(choice == "3"):
-				manage_keys_help()
-			elif(choice == "4"):
-				manage_primes_help()
-			elif(choice == "5"):
-				analyze_holes_help()
-			elif(choice == "6"):
-				output_results_help()
-			elif(choice == "7"):
 				manage_septuples_help()
-			elif(choice == "8"):
+			elif(choice == "4"):
+				manage_keys_help()
+			elif(choice == "5"):
+				manage_primes_help()
+			elif(choice == "6"):
+				analyze_holes_help()
+			elif(choice == "7"):
 				plaintext_selection_help()
-			elif(choice == "9"):
-				print("Ciphertext help selected")
-			elif(choice == "10"):
+			elif(choice == "8"):
 				display_system_data_help()
-			elif(choice == "11"):
+			elif(choice == "9"):
 				save_load_data_help()
-			elif(choice == "12"):
+			elif(choice == "10"):
 				RSA_Sandbox_overview()
 			elif((choice == "q") or (choice == "Q")):
 				break
@@ -811,20 +813,18 @@ class RSA_sandbox():
 			elif(choice == "2"):
 				self.encrypt_padding()
 			elif(choice == "3"):
-				self.manage_keys()
-			elif(choice == "4"):
-				self.manage_primes()
-			elif(choice == "5"):
-				self.analyze_holes()
-			elif(choice == "6"):
-				self.output_results()
-			elif(choice == "7"):
 				self.manage_septuples()			
+			elif(choice == "4"):
+				self.manage_keys()
+			elif(choice == "5"):
+				self.manage_primes()
+			elif(choice == "6"):
+				self.manage_plaintext()
+			elif(choice == "7"):
+				self.analyze_holes()
 			elif(choice == "8"):
-				self.set_plaintext()
-			elif(choice == "9"):
 				self.display_system_data()
-			elif(choice == "10"):
+			elif(choice == "9"):
 				self.system_data_management()
 			elif((choice == "M") or (choice == "m")):
 				self.display_main_menu()
