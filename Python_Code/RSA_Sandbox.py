@@ -543,6 +543,19 @@ class RSA_sandbox():
 				self.show_keys_for_septuple(self.encryption_objects[int(choice)])
 				self.key_generation_menu()
 				choice = selection_prompt()
+			#Generate keys from septuples
+			elif (choice == "5"):
+				if len(self.prime_list) == 0:
+					print("No primes generated!")
+					self.key_generation_menu()
+					choice = selection_prompt()
+				else:
+					self.view_septuples()
+					choice = input("Select septuple to view keys: ")
+					for prime in self.prime_list:
+						self.add_key_to_septuple(self.encryption_objects[int(choice)], prime)
+					self.key_generation_menu()
+					choice = selection_prompt()
 			elif ((choice == "q") or (choice == "Q")):
 				break
 	
