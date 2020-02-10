@@ -30,34 +30,43 @@ class RSA_sandbox():
 
 	def __init__(self):
 		#Internal data variables
+		
+		#Internal variables to store plain/cipher text and plain/cipher text files
 		self.plain_text = None
 		self.plain_text_file = None
 		self.cipher_text = None
 		self.cipher_text_file = None
 		self.active_encryption_object = None
+		
+		#Store the encryption objects and primes inside internal lists
 		self.encryption_objects = []
 		self.prime_list = []
+		
+		#The encryption keys exist in a dictionary 
 		self.encryption_keys = {} 
 		self.public_keys = [3, 5, 17, 257, 65537]
 		
+		#Make the plaintext folder if it doesn't exist
 		if not os.path.exists("./Plaintext/"):
 			os.mkdir("./Plaintext/")
 		
+		#Make the ciphertext folder if it doesn't exist
 		if not os.path.exists("./Ciphertext/"):
 			os.mkdir("./Ciphertext/")
 		
+		#Make the results folder if it doesn't exist
 		if not os.path.exists("./Results/"):
 			os.mkdir("./Results/")
 		
-		
+		#Finish the initialization with the welcome message and display the main menu 
 		self.welcome_message()
 		self.display_main_menu()
 		
-	#************************************
-	#									*
-	#        Menu calling functions    	*
-	#									*
-	#************************************
+	#************************************************************************************
+	#																					*
+	#        Menu calling functions: Calls relevant function from menus_prompts.py   	*
+	#																					*
+	#************************************************************************************
 	
 	def display_main_menu(self):
 		display_main_menu()
@@ -77,11 +86,11 @@ class RSA_sandbox():
 	def welcome_message(self):
 		welcome_message()
 	
-	#************************************
-	#									*
-	#      Prompt calling functions    	*
-	#									*
-	#************************************
+	#****************************************************************************************
+	#																						*
+	#      Prompt calling functions. Calls the relevant function from menu_prompts.py    	*
+	#																						*
+	#****************************************************************************************
 	
 	def main_menu_selection_prompt(self):
 		selection = main_menu_selection_prompt()
@@ -102,12 +111,14 @@ class RSA_sandbox():
 	def save_data_profile(self):
 		#Get folder name to save data from the user
 		folder_name = input("Enter profile folder name (Ex: Arons_Settings): ")
+		
 		#If folder already exists, remove it so we can overwrite
 		if os.path.exists("./" + str(folder_name)):
 			shutil.rmtree("./" + str(folder_name))
-		#Make the folder
+			
+		#Make the folder anew
 		os.mkdir(folder_name)
-		#Call the function to save the encryption object data
+		#Call the functions to save all system data: objects, keys, primes, plaintext, etc
 		save_encryption_objects(folder_name, self.encryption_objects)
 		save_key_data(folder_name, self.encryption_keys)
 		save_primes_data(folder_name, self.prime_list)
@@ -129,6 +140,7 @@ class RSA_sandbox():
 		folder_name = input("Enter profile folder name (Ex: Arons_Settings): ")
 		#See if it exists
 		if os.path.isdir("./" + str(folder_name)):
+			#Indicate if the folder was found
 			print("Folder '", str(folder_name), "' found! Loading settings...")
 			#Call the load functions to reload system data
 			self.encryption_objects = load_encryption_objects(folder_name)
@@ -181,24 +193,27 @@ class RSA_sandbox():
 			#Load plaintext
 			elif(choice == "5"):
 				plaintext_folder = os.listdir("./Plaintext/")
+				#Alert user if no files exist in the plaintext folder
 				if len(plaintext_folder) == 0:
 					print("Plaintext folder is empty!")
+				#Otherwise, show them all and prompt for which file to upload
 				else:
+					valid = False
 					for index, file in enumerate(plaintext_folder):
 						print(str(index), " - ", str(file))
-						choice = selection_prompt()
-						try:
-							self.plain_text_file = "./Plaintext/" + str(file)
-							with open(self.plain_text_file) as f:
-								self.plain_text = f.read()
-						
-						
-						except IndexError:
-							print("Invalid choice")
-							pass
-						
-						
-						
+					choice = selection_prompt()
+					
+					for index, file in enumerate(plaintext_folder):
+						if int(choice) == index:
+							file_to_open = plaintext_folder[int(choice)]
+							valid = True
+							break
+					if (valid == True):
+						self.plain_text_file = "./Plaintext/" + str(file)
+						with open(self.plain_text_file) as f:
+							self.plain_text = f.read()
+					else:
+						print("Invalid selection")
 				system_data_menu()
 				choice = selection_prompt()
 			#Quit to main menu
