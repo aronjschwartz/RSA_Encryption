@@ -652,7 +652,7 @@ class RSA_sandbox():
 				#Round transparency to nearest hundreth
 				transparency = round((float(holes_num)/(self.active_encryption_object.n -1))*100, 2)
 				print("***** Results *****: ")
-				print(self.format_results(self.active_encryption_object.get_septuple(), holes_num, transparency))
+				print(self.format_results(self.active_encryption_object.get_septuple(), holes_num, transparency), "%")
 				
 				holes_search_menu()
 				choice = selection_prompt()
