@@ -386,6 +386,7 @@ class RSA_sandbox():
 				choice = self.selection_prompt()
 			#Encrypt an input string from the user
 			elif (choice == "2"):
+				print("The active: ", self.active_encryption_object.get_septuple())
 				#Lists to hold values
 				plain_text_ascii = []
 				cipher_text_ascii = []
@@ -393,21 +394,15 @@ class RSA_sandbox():
 				
 				#Prompt the user to input a string to be encrypted
 				plain_text_string = input("Enter string to encrypt: ")
-				
 				#Converte the string to a list of equivalent ascii integers
 				plain_text_ascii = get_ascii_list(plain_text_string)
-
 				#Encrypt each number in the plain-text ascii list to obtain the cipher-ascii list
 				cipher_text_ascii = self.active_encryption_object.encrypt_int_list(plain_text_ascii)
-						
 				#Generate the cipher text string from the cipher-ascii list
 				cipher_text_string = get_string_from_ascii(cipher_text_ascii)
-				
 				decrypted_cipher_ascii= self.active_encryption_object.decrypt_int_list(cipher_text_ascii)
-				
 				#Generate the resulting string after decrypting the cipher text list 
 				decrypted_ciphertext_string = get_string_from_ascii(decrypted_cipher_ascii)
-				
 				#Display the original plain text, cipher text, and the decrypted_cipher_text (which should equal the plain text)
 				print("\n\nPlain text: ", plain_text_string)
 				print("\nCipher text: ", cipher_text_string)
@@ -714,7 +709,7 @@ class RSA_sandbox():
 							
 				
 				holes_search_menu()
-				choice - selection_prompt()
+				choice = selection_prompt()
 				
 			
 			elif((choice == "q") or (choice == "Q")):

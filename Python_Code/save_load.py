@@ -65,7 +65,7 @@ def load_encryption_objects(folder_name):
 		reader = csv.reader(f)
 		for line in reader:
 			data = ast.literal_eval(line[0])
-			septuple = encrypt.encryption_set(p=int(data[0]),q=int(data[1]), custom_e=int(data[4]), custom_d=int(data[5]), custom_k=int(data[6]))
+			septuple = encrypt.encryption_set(p=int(data[0]),q=int(data[1]), custom_e=int(data[4]), custom_k=int(data[5]), custom_d=int(data[6]))
 			septuple_list.append(septuple)
 	return septuple_list
 
@@ -77,7 +77,7 @@ def load_key_data(folder_name):
 		for line in reader:
 			sept_list = ast.literal_eval(line[0])
 			keys = ast.literal_eval(line[1])
-			septuple = encrypt.encryption_set(p=sept_list[0],q=sept_list[1], custom_e=sept_list[4], custom_d=sept_list[5], custom_k=sept_list[6])
+			septuple = encrypt.encryption_set(p=sept_list[0],q=sept_list[1], custom_e=sept_list[4], custom_k=sept_list[5], custom_d=sept_list[6])
 			encryption_keys[septuple] = keys
 	return encryption_keys
 
@@ -98,5 +98,5 @@ def load_active_object_data(folder_name):
 		for line in reader:
 			if len(line) > 0:
 				data = ast.literal_eval(line[0])
-				active_encryption_object = encrypt.encryption_set(p=int(data[0]),q=int(data[1]), custom_e=int(data[4]), custom_d=int(data[5]), custom_k=int(data[6]))
+				active_encryption_object = encrypt.encryption_set(p=int(data[0]),q=int(data[1]), custom_e=int(data[4]), custom_k=int(data[5]), custom_d=int(data[6]))
 	return active_encryption_object
