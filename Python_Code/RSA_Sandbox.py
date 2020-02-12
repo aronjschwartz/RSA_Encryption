@@ -421,10 +421,20 @@ class RSA_sandbox():
 				else:
 					self.view_septuples()
 					choice = input("Select septuple encrypt plaintext: ")
-					septuple = self.encryption_objects[int(choice)]
-					self.plain_text_file = "./Plaintext/" + str(file)
-					with open(self.plain_text_file) as f:
-						self.plain_text = f.read()
+					try:
+						septuple = self.encryption_objects[int(choice)]
+					except Exception:
+						print("Invalid selection")
+						break
+					self.cipher_text = septuple.encrypt_int_list(get_ascii_list(self.plain_text))
+					decrypted = septuple.decrypt_int_list(self.cipher_text)
+					print("The cipher is: ",  get_string_from_ascii(self.cipher_text))
+					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(septuple.get_n()) + "," + str(septuple.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
+					
+					print("The plain text is: ", self.plain_text)
+					print("The ciphertext is: ", get_string_from_ascii(self.cipher_text))
+					print("Decrypted: ", get_string_from_ascii(decrypted))
+					break
 					
 				self.encryption_selection_menu()
 				choice = self.selection_prompt()
@@ -527,7 +537,23 @@ class RSA_sandbox():
 				else:
 					self.view_septuples()
 					choice = input("Select septuple to add key: ")
+					try:
+						val = self.encryption_objects[int(choice)]
+					except Exception:
+						print("Invalid selection")
+						break
+					
+					
+					
 					e_choice = input("Enter e value: ")
+					try:
+						val = int(e_choice)
+					except ValueError:
+						print("Integer input required!")
+						break
+					if not check_coprimality(int(p_choice)*int(q_choice), int(e_choice)):
+						print("Co primality conditions not met!")
+						break
 					self.add_key_to_septuple(self.encryption_objects[int(choice)], int(e_choice))
 					self.key_generation_menu()
 					choice = selection_prompt()
