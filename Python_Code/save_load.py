@@ -113,7 +113,7 @@ def load_primes_data(folder_name):
 
 #Function to load the active object
 def load_active_object_data(folder_name):
-	active_encryption_object = ""
+	active_encryption_object = None
 	try:
 		with open("./" + str(folder_name) + "/active_septuple.csv", 'r')  as f:
 			reader = csv.reader(f)

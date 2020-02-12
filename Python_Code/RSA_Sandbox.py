@@ -120,14 +120,11 @@ class RSA_sandbox():
 		
 		#If folder already exists, remove it so we can overwrite
 		if os.path.exists("./" + str(folder_name)):
-			shutil.rmtree("./" + str(folder_name))
-			
-		#Make the folder anew
-		try:
-			os.mkdir(folder_name)
-		except PermissionError as e:
-			print("Error saving file: ", str(e))
-			print("Ensure folder is closed!")
+			for root, dirs, files in os.walk("./" + str(folder_name)):
+				for file in files:
+					os.remove(os.path.join(root, file))
+		else:
+			os.makedirs(folder_name)
 		#Call the functions to save all system data: objects, keys, primes, plaintext, etc
 		save_encryption_objects(folder_name, self.encryption_objects)
 		save_key_data(folder_name, self.encryption_keys)
@@ -171,7 +168,6 @@ class RSA_sandbox():
 	
 	
 	def create_ciphertext_file(self, file_name, ciphertext):
-		print("The file name is: ", file_name)
 		with open(self.ciphertext_folder + str(file_name) + ".txt", 'w')  as f:
 			f.write(str(ciphertext))
 			f.close()
@@ -282,8 +278,11 @@ class RSA_sandbox():
 		#Loop through the septuple list and print, catch the active septuple and indicate with extra characters
 		print("\n*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
 		for index, object in enumerate(self.encryption_objects):
-			if (self.active_encryption_object.get_septuple() == object.get_septuple()):
-				print(index, " - ", str(object.get_septuple()) + " *** active ***")
+			if self.active_encryption_object is not None:
+				if self.active_encryption_object.get_septuple() == object.get_septuple():
+					print(index, " - ", str(object.get_septuple()) + " *** active ***")
+				else:
+					print(index, " - ", str(object.get_septuple()))
 			else:
 				print(index, " - ", str(object.get_septuple()))
 		print()
@@ -298,9 +297,13 @@ class RSA_sandbox():
 	def view_septuples_with_keys(self):
 		print("\n*** Displaying septuple list (" + str(len(self.encryption_objects)) + " loaded) ***")
 		for index, object in enumerate(self.encryption_objects):
-			if (self.active_encryption_object.get_septuple() == object.get_septuple()):
-				print(index, " - ", str(object.get_septuple()) + " *** active ***")
-				self.show_keys_for_septuple(object)
+			if self.active_encryption_object is not None:
+				if (self.active_encryption_object.get_septuple() == object.get_septuple()):
+					print(index, " - ", str(object.get_septuple()) + " *** active ***")
+					self.show_keys_for_septuple(object)
+				else:
+					print(index, " - ", str(object.get_septuple()))
+					self.show_keys_for_septuple(object)
 			else:
 				print(index, " - ", str(object.get_septuple()))
 				self.show_keys_for_septuple(object)
@@ -411,7 +414,6 @@ class RSA_sandbox():
 				if((choice == "Y") or (choice == "y")):
 					self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
 					decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
-					print("The cipher is: ",  get_string_from_ascii(self.cipher_text))
 					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
 					
 					print("The plain text is: ", self.plain_text)
@@ -691,7 +693,7 @@ class RSA_sandbox():
 	def format_results(self, septuple, holes_num, transparency):
 		result_string = "Septuple: " + str(septuple) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
 		return result_string
-		
+	
 	#****************************************************************
 	#																*
 	#  analyze_holes(): Handles the hole analysis functionality	 	*
