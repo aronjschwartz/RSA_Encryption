@@ -12,6 +12,7 @@
 
 #Import all required libraries
 from encrypt import encryption_set
+from encrypt import check_coprimality
 from menus_prompts import *
 from encryption_test import *
 from save_load import *
@@ -170,7 +171,8 @@ class RSA_sandbox():
 	
 	
 	def create_ciphertext_file(self, file_name, ciphertext):
-		with open(self.ciphertext_folder + str(file_name), 'w')  as f:
+		print("The file name is: ", file_name)
+		with open(self.ciphertext_folder + str(file_name) + ".txt", 'w')  as f:
 			f.write(str(ciphertext))
 			f.close()
 		return
@@ -342,8 +344,18 @@ class RSA_sandbox():
 		q_choice = int(input("Enter q: "))
 		choice = input("Specify e? [Y/N]: ")
 		if ((choice == "y") or (choice == "Y")):
-			e_choice = int(input("Select e: "))
-			septuple_object = encryption_set(p=p_choice, q=q_choice, custom_e = e_choice)
+			e_choice = input("Select e: ")
+			print("The choice is: ", str(e_choice))
+			try:
+				val = int(e_choice)
+			except ValueError:
+				print("Integer input required!")
+				return None
+			if not check_coprimality(int(p_choice)*int(q_choice), int(e_choice)):
+				print("Co primality conditions not met!")
+				return None
+			else:
+				septuple_object = encryption_set(p=p_choice, q=q_choice, custom_e = e_choice)
 		else:
 			septuple_object = encryption_set(p =p_choice, q=q_choice, custom_e = 65537)
 		print("\nEncryption object created!")
@@ -373,6 +385,9 @@ class RSA_sandbox():
 			print("No active encryption object detected, generating...")
 			#Get p and q from the user, and see if they want to specify other values
 			septuple = self.create_septuple_user_input()
+			if septuple is None:
+				print("Object creation failed")
+				return 
 			print("Encryption object created!")
 			self.active_encryption_object = septuple
 			self.encryption_objects.append(self.active_encryption_object)
@@ -396,8 +411,8 @@ class RSA_sandbox():
 				if((choice == "Y") or (choice == "y")):
 					self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
 					decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
-					
-					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", self.cipher_text)
+					print("The cipher is: ",  get_string_from_ascii(self.cipher_text))
+					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
 					
 					print("The plain text is: ", self.plain_text)
 					print("The ciphertext is: ", get_string_from_ascii(self.cipher_text))
@@ -667,7 +682,11 @@ class RSA_sandbox():
 					choice = input("No object loaded! Create one? [Y/N]: ")
 					if ((choice == "y") or (choice == "Y")):
 						septuple = self.create_septuple_user_input()
-						self.encryption_objects.append(septuple)
+						if septuple is None:
+							print("Object creation failed!")
+							break
+						else:
+							self.encryption_objects.append(septuple)
 				
 						if len(self.encryption_objects) == 1:
 							self.active_encryption_object = septuple
@@ -780,10 +799,12 @@ class RSA_sandbox():
 			elif (choice == "2"):
 				print("Creating septuple..")
 				septuple = self.create_septuple_user_input()
-				self.encryption_objects.append(septuple)
-				
-				if len(self.encryption_objects) == 1:
-					self.active_encryption_object = septuple
+				if septuple is None:
+					print("Object creation failed!")
+				else:
+					self.encryption_objects.append(septuple)
+					if len(self.encryption_objects) == 1:
+						self.active_encryption_object = septuple
 				
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
@@ -816,6 +837,7 @@ class RSA_sandbox():
 			with open(self.plaintext_folder + "/" + plaintext_file) as f:
 				self.plain_text = f.read()
 				self.plain_text_file = plaintext_file
+				self.plain_text_file = self.plain_text_file.replace(".txt", "")
 			print("Plaintext set to file: ", str(plaintext_file))
 		return ""
 	
