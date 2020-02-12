@@ -101,7 +101,6 @@ def system_data_menu():
 	print("2 - Load data from profile")
 	print("3 - Load septuples")
 	print("4 - Load keys")
-	print("5 - Load plaintext")
 	print("Q - Return to main menu\n")
 	return
 	
@@ -114,13 +113,6 @@ def key_generation_menu():
 	print("5 - Generate keys from primes")
 	print("Q - Return to main menu\n")
 	return 
-
-def plaintext_management_menu():
-	print("\n\n******** PLAINTEXT MANAGEMENT MENU ********\n")
-	print("1 - Load plaintext")
-	print("2 - Enter plaintext manually")
-	print("3 - Clear plaintext")
-	print("Q - Return to main menu\n")
 
 def welcome_message():
 	print("*********************************************************")

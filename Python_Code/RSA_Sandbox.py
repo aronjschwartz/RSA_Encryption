@@ -31,7 +31,7 @@ class RSA_sandbox():
 	def __init__(self):
 		#Internal data variables
 		
-		#Internal variables to store plain/cipher text and plain/cipher text files
+		#Internal variables to store plain/cipher text and files
 		self.plain_text = None
 		self.plain_text_file = None
 		self.cipher_text = None
@@ -49,11 +49,16 @@ class RSA_sandbox():
 		#Make the plaintext folder if it doesn't exist
 		if not os.path.exists("./Plaintext/"):
 			os.mkdir("./Plaintext/")
+			
+		#Set the plaintext folder variable
+		self.plaintext_folder = "./Plaintext/"
 		
 		#Make the ciphertext folder if it doesn't exist
 		if not os.path.exists("./Ciphertext/"):
 			os.mkdir("./Ciphertext/")
 		
+		#Set the ciphertext folder variable
+		self.ciphertext_folder = "./Ciphertext/"
 		#Make the results folder if it doesn't exist
 		if not os.path.exists("./Results/"):
 			os.mkdir("./Results/")
@@ -117,7 +122,11 @@ class RSA_sandbox():
 			shutil.rmtree("./" + str(folder_name))
 			
 		#Make the folder anew
-		os.mkdir(folder_name)
+		try:
+			os.mkdir(folder_name)
+		except PermissionError as e:
+			print("Error saving file: ", str(e))
+			print("Ensure folder is closed!")
 		#Call the functions to save all system data: objects, keys, primes, plaintext, etc
 		save_encryption_objects(folder_name, self.encryption_objects)
 		save_key_data(folder_name, self.encryption_keys)
@@ -159,6 +168,42 @@ class RSA_sandbox():
 			print("Folder '", str(folder_name), "' does not exist! Data load failed")
 		return
 	
+	
+	def create_ciphertext_file(self, file_name, ciphertext):
+		with open(self.ciphertext_folder + str(file_name), 'w')  as f:
+			f.write(str(ciphertext))
+			f.close()
+		return
+	
+	def display_plaintext_folder_contents(self):
+		for index, file in enumerate(os.listdir(self.plaintext_folder)):
+			print(str(index), " - ", str(file))
+		return
+		
+	def load_plaintext_select_file(self):
+		#Display message and return None if nothing exists in the plaintext folder
+		if len(os.listdir(self.plaintext_folder)) == 0:
+			return None
+		#Otherwise, display the contents of the folder
+		else:
+			valid = False
+			#Show all the files contained in the plaintext folder
+			self.display_plaintext_folder_contents()
+			choice = selection_prompt()
+			#Loop until they select a valid file
+			while(1):
+				for index, file in enumerate(os.listdir(self.plaintext_folder)):
+					if int(choice) == index:
+						file_to_open = file
+						valid = True
+						break
+				if (valid == True):
+					break
+				else:
+					print("Invalid choice!")
+					self.display_plaintext_folder_contents()
+					choice = selection_prompt()
+		return file_to_open
 	#*************************************************************************************************
 	#																								 *
 	#  system_data_management(): Handles various options related to saving and loading system data   *
@@ -190,32 +235,7 @@ class RSA_sandbox():
 				print("Load keys")
 				system_data_menu()
 				choice = selection_prompt()
-			#Load plaintext
-			elif(choice == "5"):
-				plaintext_folder = os.listdir("./Plaintext/")
-				#Alert user if no files exist in the plaintext folder
-				if len(plaintext_folder) == 0:
-					print("Plaintext folder is empty!")
-				#Otherwise, show them all and prompt for which file to upload
-				else:
-					valid = False
-					for index, file in enumerate(plaintext_folder):
-						print(str(index), " - ", str(file))
-					choice = selection_prompt()
-					
-					for index, file in enumerate(plaintext_folder):
-						if int(choice) == index:
-							file_to_open = plaintext_folder[int(choice)]
-							valid = True
-							break
-					if (valid == True):
-						self.plain_text_file = "./Plaintext/" + str(file)
-						with open(self.plain_text_file) as f:
-							self.plain_text = f.read()
-					else:
-						print("Invalid selection")
-				system_data_menu()
-				choice = selection_prompt()
+		
 			#Quit to main menu
 			elif((choice == "q") or (choice == "Q")):
 				break
@@ -358,6 +378,7 @@ class RSA_sandbox():
 			self.encryption_objects.append(self.active_encryption_object)
 		else:
 			print("Active septuple: ", self.active_encryption_object.get_septuple())
+			
 		#See what the user wants to encrypt
 		self.encryption_selection_menu()
 		choice = self.selection_prompt()
@@ -365,23 +386,31 @@ class RSA_sandbox():
 			#Encrypt the plaintext, if it exists
 			if (choice == "1"):
 				if self.plain_text is None:
-					print("No plaintext loaded!")
+					print("No plain text selected!")
+					check_contents = self.manage_plaintext()
+					if check_contents is None:
+						return
+			
+				print("Use active object? ", str(self.active_encryption_object.get_septuple()), "? [Y/N]: ")
+				choice = selection_prompt()
+				if((choice == "Y") or (choice == "y")):
+					self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
+					decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
+					
+					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", self.cipher_text)
+					
+					print("The plain text is: ", self.plain_text)
+					print("The ciphertext is: ", get_string_from_ascii(self.cipher_text))
+					print("Decrypted: ", get_string_from_ascii(decrypted))
+					break
 				else:
-					print("Use active object? ", str(self.active_encryption_object.get_septuple()), "? [Y/N]: ")
-					choice = selection_prompt()
-					if((choice == "Y") or (choice == "y")):
-						self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
-						decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
-						print("The plain text is: ", self.plain_text)
-						print("The ciphertext is: ", get_string_from_ascii(self.cipher_text))
-						print("Decrypted: ", get_string_from_ascii(decrypted))
-						break
-					else:
-						print("Choose septuple")
-				
-				
-				
-				
+					self.view_septuples()
+					choice = input("Select septuple encrypt plaintext: ")
+					septuple = self.encryption_objects[int(choice)]
+					self.plain_text_file = "./Plaintext/" + str(file)
+					with open(self.plain_text_file) as f:
+						self.plain_text = f.read()
+					
 				self.encryption_selection_menu()
 				choice = self.selection_prompt()
 			#Encrypt an input string from the user
@@ -779,8 +808,16 @@ class RSA_sandbox():
 		print("Analyze septuple selected")
 		
 	def manage_plaintext(self):
-		plaintext_management_menu()
-		choice = selection_prompt()
+		plaintext_file = self.load_plaintext_select_file()
+		if plaintext_file == None:
+			print("Plaintext folder is empty!")
+			return None
+		else:
+			with open(self.plaintext_folder + "/" + plaintext_file) as f:
+				self.plain_text = f.read()
+				self.plain_text_file = plaintext_file
+			print("Plaintext set to file: ", str(plaintext_file))
+		return ""
 	
 	
 	#******************************************************************************************
