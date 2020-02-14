@@ -637,7 +637,9 @@ class RSA_sandbox():
 									print("Success!")
 									
 									#If the old sept was the active, make the new one the active
-									if (self.active_encryption_object.get_septuple() == old_septuple.get_septuple()):
+									if self.active_encryption_object is None:
+										self.active_encryption_object = new_sept
+									elif (self.active_encryption_object.get_septuple() == old_septuple.get_septuple()):
 										self.active_encryption_object = new_sept
 								found = True
 								break
