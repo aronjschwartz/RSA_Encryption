@@ -110,7 +110,8 @@ def key_generation_menu():
 	print("2 - Swap keys")
 	print("3 - Clear keys")
 	print("4 - View keys")
-	print("5 - Generate keys from primes")
+	print("5 - Add keys from prime list")
+	print("6 - Add keys to all septuples from prime list")
 	print("Q - Return to main menu\n")
 	return 
 

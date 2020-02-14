@@ -191,10 +191,14 @@ class RSA_sandbox():
 			#Loop until they select a valid file
 			while(1):
 				for index, file in enumerate(os.listdir(self.plaintext_folder)):
-					if int(choice) == index:
-						file_to_open = file
-						valid = True
-						break
+					try:
+						if int(choice) == index:
+							file_to_open = file
+							valid = True
+							break
+					except ValueError:
+						print("Invalid entry!")
+						return "INVALID"
 				if (valid == True):
 					break
 				else:
@@ -445,16 +449,16 @@ class RSA_sandbox():
 					if check_contents is None:
 						return
 			
-				print("Use active object? ", str(self.active_encryption_object.get_septuple()), "? [Y/N]: ")
-				choice = selection_prompt()
+				choice = input("Use active object? " + str(self.active_encryption_object.get_septuple()) + "? [Y/N]: ")
 				if((choice == "Y") or (choice == "y")):
 					self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
 					decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
 					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
 					
-					print("The plain text is: ", self.plain_text)
-					print("The ciphertext is: ", get_string_from_ascii(self.cipher_text))
-					print("Decrypted: ", get_string_from_ascii(decrypted))
+					print("\n\nThe plain text is: ", self.plain_text)
+					print("\nThe ciphertext is: ", get_string_from_ascii(self.cipher_text))
+					print("\nDecrypted: ", get_string_from_ascii(decrypted))
+					print()
 					break
 				else:
 					self.view_septuples()
@@ -472,6 +476,7 @@ class RSA_sandbox():
 					print("\n\nThe plain text is: ", self.plain_text)
 					print("\nThe ciphertext is: ", get_string_from_ascii(self.cipher_text))
 					print("\nDecrypted: ", get_string_from_ascii(decrypted))
+					print()
 					break
 					
 				self.encryption_selection_menu()
@@ -576,7 +581,7 @@ class RSA_sandbox():
 					self.view_septuples()
 					choice = input("Select septuple to add key: ")
 					try:
-						val = self.encryption_objects[int(choice)]
+						septuple = self.encryption_objects[int(choice)]
 					except Exception:
 						print("Invalid selection")
 						break
@@ -589,7 +594,7 @@ class RSA_sandbox():
 					except ValueError:
 						print("Integer input required!")
 						break
-					if not check_coprimality(int(p_choice)*int(q_choice), int(e_choice)):
+					if not check_coprimality(((int(septuple.get_p()) -1)*(int(septuple.get_q()) - 1)), int(e_choice)):
 						print("Co primality conditions not met!")
 						break
 					self.add_key_to_septuple(self.encryption_objects[int(choice)], int(e_choice))
@@ -645,7 +650,6 @@ class RSA_sandbox():
 							self.encryption_keys[self.encryption_objects[int(sept_choice)]] = self.encryption_keys[old_septuple]
 							del self.encryption_keys[old_septuple]
 							print("Success!")
-				print("THE KEY LIST IS: ")
 				self.show_key_list()	
 				self.key_generation_menu()
 				choice = selection_prompt()
@@ -661,22 +665,50 @@ class RSA_sandbox():
 				self.show_keys_for_septuple(self.encryption_objects[int(choice)])
 				self.key_generation_menu()
 				choice = selection_prompt()
-			#Generate keys from septuples
+			#Add primes to specific septuple
 			elif (choice == "5"):
 				if len(self.prime_list) == 0:
 					print("No primes generated!")
 					self.key_generation_menu()
 					choice = selection_prompt()
+				elif len(self.encryption_objects) == 0:
+					print("No septuples loaded!")
+					self.key_generation_menu()
+					choice = selection_prompt()
 				else:
 					self.view_septuples()
 					choice = input("Select septuple to view keys: ")
-					for prime in self.prime_list:
+					try:
+						val = self.encryption_objects[int(choice)]
+					except ValueError:
+						print("Invalid selection!")
+						break
+					for prime in self.prime_list:					
 						self.add_key_to_septuple(self.encryption_objects[int(choice)], prime)
+					self.key_generation_menu()
+					choice = selection_prompt()
+			#Add primes to keys of all septuples
+			elif (choice == "6"):
+				if len(self.prime_list) == 0:
+					print("No primes generated!")
+					self.key_generation_menu()
+					choice = selection_prompt()
+				elif len(self.encryption_objects) == 0:
+					print("No septuples loaded!")
+					self.key_generation_menu()
+					choice = selection_prompt()
+				else:
+					for septuple in self.encryption_objects:
+						for prime in self.prime_list:
+							self.add_key_to_septuple(septuple, prime)
 					self.key_generation_menu()
 					choice = selection_prompt()
 			elif ((choice == "q") or (choice == "Q")):
 				break
-	
+			else:
+				print("Invalid choice!")
+				self.key_generation_menu()
+				choice = selection_prompt()
 	
 	
 	def show_key_list(self):
@@ -795,7 +827,6 @@ class RSA_sandbox():
 			elif(choice == "3"):
 			
 				result_transparency_dict = {}
-				transparency_list = []
 			
 				for index, object in enumerate(self.encryption_objects):
 					print(str(index) + " - " + str(object.get_septuple()))
@@ -804,20 +835,23 @@ class RSA_sandbox():
 				for key, value in self.encryption_keys.items():
 					if key.get_septuple() == sept.get_septuple():
 						for encryption_key in value:
+							print("Checking key: ", str(encryption_key))
 							temp_sept = encrypt.encryption_set(p=sept.get_p(), q=sept.get_q(), custom_e=int(encryption_key))
 							holes_num = temp_sept.search_holes()
 							#Round transparency to nearest hundreth
 							transparency = round((float(holes_num)/(sept.n -1))*100, 2)
 							result_string = self.format_results_with_keys(temp_sept.get_septuple(), holes_num, transparency)
-							result_transparency_dict[transparency] = result_string
-							transparency_list.append(transparency)
-				
+							if transparency in result_transparency_dict:
+								result_transparency_dict[transparency].append(result_string)
+							else:
+								result_transparency_dict[transparency] = [result_string]
+							
 				#Display the results sorted by transparency
 				print("\n\n*********** RANKED RESULTS **************")
-				for transparency in list(reversed(sorted(transparency_list))):
-					for key, value in result_transparency_dict.items():
-						if key == transparency:
-							print(value, "%")
+				for key, value in reversed(sorted(result_transparency_dict.items())):
+					for entry in value:
+						print(entry, "%")
+		
 							
 				
 				holes_search_menu()
@@ -873,7 +907,12 @@ class RSA_sandbox():
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
 			elif (choice == "3"):
-				print("Clearing septuple list...")
+				confirm = input("Erase all seputples? [Y/N]: ")
+				if ((confirm == "y") or (confirm == "Y")):
+					self.encryption_objects = []
+					self.active_encryption_object = None
+					self.encryption_keys = {}
+					print("**** Septuple and Key data erased *****")
 				self.encryption_objects.clear()
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
@@ -897,12 +936,14 @@ class RSA_sandbox():
 		if plaintext_file == None:
 			print("Plaintext folder is empty!")
 			return None
+		elif plaintext_file == "INVALID":
+			return None
 		else:
 			with open(self.plaintext_folder + "/" + plaintext_file) as f:
 				self.plain_text = f.read()
 				self.plain_text_file = plaintext_file
 				self.plain_text_file = self.plain_text_file.replace(".txt", "")
-			print("Plaintext set to file: ", str(plaintext_file))
+			print("\nPlaintext set to file: ", str(plaintext_file))
 		return ""
 	
 	
