@@ -332,6 +332,20 @@ class RSA_sandbox():
 			X = [a for a in X if a % p != 0]                        # (7)
 		return P + X                                                # (8)
 	
+	#From stack overflow
+	def is_prime(self, n):
+		if n == 2:
+			return True
+		if n % 2 == 0 or n <=1:
+			return False
+		sqr = int(math.sqrt(n)) + 1
+		for divisor in range(3, sqr, 2):
+			if n % divisor == 0:
+				return False
+		return True
+	
+	
+	
 	#************************************************************************************
 	#																					*
 	#  create_septuple_user_input(): Creates a septuple from user input.  Allows for    *
@@ -342,10 +356,32 @@ class RSA_sandbox():
 	def create_septuple_user_input(self):
 		if len(self.prime_list) == 0:
 			print("No primes list loaded")
-
-		p_choice = int(input("Enter p: "))
-		q_choice = int(input("Enter q: "))
-		choice = input("Specify e? [Y/N]: ")
+		p_choice = input("Enter p: ")
+		try:
+			p_choice = int(p_choice)
+			
+		except ValueError:
+			print("'", str(p_choice), "' is not a valid integer!")
+			return None
+			
+		if not self.is_prime(p_choice):
+			print(str(p_choice), " is not a prime number!")
+			return None
+			
+			
+		q_choice = input("Enter q: ")
+		try:
+			q_choice = int(q_choice)
+			
+		except ValueError:
+			print("'", str(q_choice), "' is not a valid integer!")
+			return None
+			
+		if not self.is_prime(q_choice):
+			print(str(q_choice), " is not a prime number!")
+			return None
+		
+		choice = input("Specify e? Press enter to use default (65537) [Y/N]: ")
 		if ((choice == "y") or (choice == "Y")):
 			e_choice = input("Select e: ")
 			print("The choice is: ", str(e_choice))
@@ -354,11 +390,11 @@ class RSA_sandbox():
 			except ValueError:
 				print("Integer input required!")
 				return None
-			if not check_coprimality(int(p_choice)*int(q_choice), int(e_choice)):
+			if not check_coprimality((int(p_choice) - 1)*(int(q_choice) - 1), int(e_choice)):
 				print("Co primality conditions not met!")
 				return None
 			else:
-				septuple_object = encryption_set(p=p_choice, q=q_choice, custom_e = e_choice)
+				septuple_object = encryption_set(p=p_choice, q=q_choice, custom_e = int(e_choice))
 		else:
 			septuple_object = encryption_set(p =p_choice, q=q_choice, custom_e = 65537)
 		print("\nEncryption object created!")
@@ -389,7 +425,7 @@ class RSA_sandbox():
 			#Get p and q from the user, and see if they want to specify other values
 			septuple = self.create_septuple_user_input()
 			if septuple is None:
-				print("Object creation failed")
+				print("*** Object creation failed! ***")
 				return 
 			print("Encryption object created!")
 			self.active_encryption_object = septuple
@@ -433,9 +469,9 @@ class RSA_sandbox():
 					print("The cipher is: ",  get_string_from_ascii(self.cipher_text))
 					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(septuple.get_n()) + "," + str(septuple.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
 					
-					print("The plain text is: ", self.plain_text)
-					print("The ciphertext is: ", get_string_from_ascii(self.cipher_text))
-					print("Decrypted: ", get_string_from_ascii(decrypted))
+					print("\n\nThe plain text is: ", self.plain_text)
+					print("\nThe ciphertext is: ", get_string_from_ascii(self.cipher_text))
+					print("\nDecrypted: ", get_string_from_ascii(decrypted))
 					break
 					
 				self.encryption_selection_menu()
