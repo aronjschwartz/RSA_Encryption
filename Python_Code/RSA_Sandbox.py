@@ -834,8 +834,8 @@ class RSA_sandbox():
 				sept = self.encryption_objects[int(choice)]
 				for key, value in self.encryption_keys.items():
 					if key.get_septuple() == sept.get_septuple():
-						for encryption_key in value:
-							print("Checking key: ", str(encryption_key))
+						for index, encryption_key in enumerate(value):
+							print("Checking key: ", str(encryption_key), "(", str(round((index/len(value)*100), 2)), "% complete)")
 							temp_sept = encrypt.encryption_set(p=sept.get_p(), q=sept.get_q(), custom_e=int(encryption_key))
 							holes_num = temp_sept.search_holes()
 							#Round transparency to nearest hundreth
