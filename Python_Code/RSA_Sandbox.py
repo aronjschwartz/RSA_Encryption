@@ -739,6 +739,8 @@ class RSA_sandbox():
 				for val in prime_list:
 					self.prime_list.append(val)
 				print(prime_list)
+				print("\nGenerated ", str(len(prime_list)), " primes")
+				print()
 			elif (choice == "2"):
 				lower_limit = input("Enter lower limit for prime generation: ")
 				upper_limit = input("Enter upper limit for prime generation: ")
