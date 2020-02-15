@@ -651,11 +651,32 @@ class RSA_sandbox():
 							break
 					if(found == False):
 						print("Key doesnt exist, adding to data and swapping...")
-						if (self.encryption_objects[int(sept_choice)].swap_out_e_value(int(key_choice)) == True):
-							self.add_key_to_septuple(self.encryption_objects[int(sept_choice)], int(key_choice))
-							self.encryption_keys[self.encryption_objects[int(sept_choice)]] = self.encryption_keys[old_septuple]
-							del self.encryption_keys[old_septuple]
+						if check_coprimality(int(key_choice), ((old_septuple.get_p()-1)*(old_septuple.get_q()-1))):
+							new_sept = encrypt.encryption_set(old_septuple.get_p(), old_septuple.get_q(), int(key_choice))
+							#Replace the old septuple with the new one in the encryption object list
+							
+							for index, septuple in enumerate(self.encryption_objects):
+								if septuple.get_septuple() == old_septuple.get_septuple():
+									self.encryption_objects[index] = new_sept
+							
+						
+							for key, value in self.encryption_keys.items():
+								if key.get_septuple() == old_septuple.get_septuple():
+									self.encryption_keys[new_sept] = self.encryption_keys[key]
+									self.encryption_keys[new_sept].append(int(key_choice))
+									del self.encryption_keys[key]
+									break
+							self.encryption_objects[int(sept_choice)].swap_out_e_value(int(key_choice))
 							print("Success!")
+							
+							#If the old sept was the active, make the new one the active
+							if self.active_encryption_object is None:
+								self.active_encryption_object = new_sept
+							elif (self.active_encryption_object.get_septuple() == old_septuple.get_septuple()):
+								self.active_encryption_object = new_sept
+							print("Success!")
+						else:
+							print("Value ", str(key_choice), " does not satisify coprimality!")
 				self.show_key_list()	
 				self.key_generation_menu()
 				choice = selection_prompt()
@@ -683,7 +704,7 @@ class RSA_sandbox():
 					choice = selection_prompt()
 				else:
 					self.view_septuples()
-					choice = input("Select septuple to view keys: ")
+					choice = input("Select septuple to add keys: ")
 					try:
 						val = self.encryption_objects[int(choice)]
 					except ValueError:
