@@ -17,6 +17,7 @@ from menus_prompts import *
 from encryption_test import *
 from save_load import *
 from help import *
+from datetime import datetime
 import time
 import math
 import shutil
@@ -61,9 +62,12 @@ class RSA_sandbox():
 		#Set the ciphertext folder variable
 		self.ciphertext_folder = "./Ciphertext/"
 		#Make the results folder if it doesn't exist
-		if not os.path.exists("./Results/"):
-			os.mkdir("./Results/")
-		
+		if not os.path.exists("./Results/Septuple_Comparisons"):
+			os.mkdir("./Results/Septuple_Comparisons")
+		if not os.path.exists("./Results/Transparency_Profiles"):
+			os.mkdir("./Results/Transparency_Profiles")
+			
+	
 		#Finish the initialization with the welcome message and display the main menu 
 		self.welcome_message()
 		self.display_main_menu()
@@ -806,17 +810,22 @@ class RSA_sandbox():
 			elif(choice == "2"):
 				result_transparency_dict = {}
 				transparency_list = []
+				now = datetime.now()
+				current_time = now. strftime("%H_%M_%S")
 				#Gather results for all the septuples
-				for septuple in self.encryption_objects:
-					#Analyze the holes in the septuple
-					holes_num = septuple.search_holes()
-					#Round transparency to nearest hundreth
-					transparency = round((float(holes_num)/(septuple.n -1))*100, 2)
-					result_string = self.format_results(septuple.get_septuple(), holes_num, transparency)
-					result_transparency_dict[transparency] = result_string
-					transparency_list.append(transparency)
-				
-				#Display the results sorted by transparency
+				with open("./Results/Septuple_Comparisons/Sept_Compare_" + str(current_time) + ".csv", 'w', newline='')  as f:
+					writer = csv.writer(f)
+					writer.writerow(["Septuple", "E Value", "Holes Found", "Transparency"])
+					for septuple in self.encryption_objects:
+						#Analyze the holes in the septuple
+						holes_num = septuple.search_holes()
+						#Round transparency to nearest hundreth
+						transparency = round((float(holes_num)/(septuple.n -1))*100, 2)
+						result_string = self.format_results(septuple.get_septuple(), holes_num, transparency)
+						result_transparency_dict[transparency] = result_string
+						transparency_list.append(transparency)
+						writer.writerow([septuple.get_septuple(), septuple.get_e(), holes_num, transparency])
+				#Display the results sorted by transparency and write to output folder
 				print("\n\n*********** RANKED RESULTS **************")
 				for transparency in list(reversed(sorted(transparency_list))):
 					for key, value in result_transparency_dict.items():
@@ -834,20 +843,25 @@ class RSA_sandbox():
 					print(str(index) + " - " + str(object.get_septuple()))
 				choice = input("Select septuple: ")
 				sept = self.encryption_objects[int(choice)]
-				for key, value in self.encryption_keys.items():
-					if key.get_septuple() == sept.get_septuple():
-						for index, encryption_key in enumerate(value):
-							print("Checking key: ", str(encryption_key), "(", str(round((index/len(value)*100), 2)), "% complete)")
-							temp_sept = encrypt.encryption_set(p=sept.get_p(), q=sept.get_q(), custom_e=int(encryption_key))
-							holes_num = temp_sept.search_holes()
-							#Round transparency to nearest hundreth
-							transparency = round((float(holes_num)/(sept.n -1))*100, 2)
-							result_string = self.format_results_with_keys(temp_sept.get_septuple(), holes_num, transparency)
-							if transparency in result_transparency_dict:
-								result_transparency_dict[transparency].append(result_string)
-							else:
-								result_transparency_dict[transparency] = [result_string]
-							
+				now = datetime.now()
+				current_time = now. strftime("%H_%M_%S")
+				with open("./Results/Transparency_Profiles/Trans_Profile_" + str(current_time) + ".csv", 'w', newline='')  as f:
+					writer = csv.writer(f)
+					writer.writerow(["Septuple", "Holes_Found", "E Value", "Transparency"])
+					for key, value in self.encryption_keys.items():
+						if key.get_septuple() == sept.get_septuple():
+							for index, encryption_key in enumerate(value):
+								print("Checking key: ", str(encryption_key), "(", str(round((index/len(value)*100), 2)), "% complete)")
+								temp_sept = encrypt.encryption_set(p=sept.get_p(), q=sept.get_q(), custom_e=int(encryption_key))
+								holes_num = temp_sept.search_holes()
+								#Round transparency to nearest hundreth
+								transparency = round((float(holes_num)/(sept.n -1))*100, 2)
+								result_string = self.format_results_with_keys(temp_sept.get_septuple(), holes_num, transparency)
+								if transparency in result_transparency_dict:
+									result_transparency_dict[transparency].append(result_string)
+								else:
+									result_transparency_dict[transparency] = [result_string]
+								writer.writerow([temp_sept.get_septuple(),  holes_num, temp_sept.get_e(), transparency])
 				#Display the results sorted by transparency
 				print("\n\n*********** RANKED RESULTS **************")
 				for key, value in reversed(sorted(result_transparency_dict.items())):
