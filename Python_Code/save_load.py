@@ -23,7 +23,7 @@ import ast
 #Function to save all loaded septuples
 def save_encryption_objects(folder_name, data):
 	try:
-		with open("./" + str(folder_name) + "/septuples.csv", 'w', newline='')  as f:
+		with open("./Profiles/" + str(folder_name) + "/septuples.csv", 'w', newline='')  as f:
 			writer = csv.writer(f)
 			for object in data:
 				writer.writerow([object.get_septuple()])
@@ -34,7 +34,7 @@ def save_encryption_objects(folder_name, data):
 #Function to save the list of prime numbers
 def save_primes_data(folder_name, data):
 	try:
-		with open("./" + str(folder_name) + "/primes_data.csv", 'w')  as f:
+		with open("./Profiles/" + str(folder_name) + "/primes_data.csv", 'w')  as f:
 			writer = csv.writer(f)
 			writer.writerow([data])
 	except Exception as e:
@@ -44,7 +44,7 @@ def save_primes_data(folder_name, data):
 #Function to save the encryption key dictionary
 def save_key_data(folder_name, data):
 	try:
-		with open("./" + str(folder_name) + "/keys.csv", 'w', newline='')  as f:
+		with open("./Profiles/" + str(folder_name) + "/keys.csv", 'w', newline='')  as f:
 			writer = csv.writer(f)
 			for key, value in data.items():
 				writer.writerow([key.get_septuple(), value])
@@ -56,7 +56,7 @@ def save_key_data(folder_name, data):
 def save_active_object_data(folder_name, data):
 	#Save the key data
 	try:
-		with open("./" + str(folder_name) + "/active_septuple.csv", 'w')  as f:
+		with open("./Profiles/" + str(folder_name) + "/active_septuple.csv", 'w')  as f:
 			writer = csv.writer(f)
 			writer.writerow([data.get_septuple()])
 	except Exception as e:
@@ -73,7 +73,7 @@ def save_active_object_data(folder_name, data):
 def load_encryption_objects(folder_name):
 	septuple_list = []
 	try:
-		with open("./" + str(folder_name) + "/septuples.csv")  as f:
+		with open("./Profiles/" + str(folder_name) + "/septuples.csv")  as f:
 			reader = csv.reader(f)
 			for line in reader:
 				data = ast.literal_eval(line[0])
@@ -87,7 +87,7 @@ def load_encryption_objects(folder_name):
 def load_key_data(folder_name):
 	encryption_keys = {}
 	try:
-		with open("./" + str(folder_name) + "/keys.csv", 'r')  as f:
+		with open("./Profiles/" + str(folder_name) + "/keys.csv", 'r')  as f:
 			reader = csv.reader(f)
 			for line in reader:
 				sept_list = ast.literal_eval(line[0])
@@ -102,7 +102,7 @@ def load_key_data(folder_name):
 def load_primes_data(folder_name):
 	prime_list = []
 	try:
-		with open("./" + str(folder_name) + "/primes_data.csv", 'r')  as f:
+		with open("./Profiles/" + str(folder_name) + "/primes_data.csv", 'r')  as f:
 			reader = csv.reader(f)
 			for line in reader:
 				if len(line) > 0:
@@ -115,7 +115,7 @@ def load_primes_data(folder_name):
 def load_active_object_data(folder_name):
 	active_encryption_object = None
 	try:
-		with open("./" + str(folder_name) + "/active_septuple.csv", 'r')  as f:
+		with open("./Profiles/" + str(folder_name) + "/active_septuple.csv", 'r')  as f:
 			reader = csv.reader(f)
 			for line in reader:
 				if len(line) > 0:

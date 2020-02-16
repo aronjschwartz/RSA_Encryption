@@ -48,6 +48,11 @@ class RSA_sandbox():
 		self.encryption_keys = {} 
 		self.public_keys = [3, 5, 17, 257, 65537]
 		
+		#Make the profiles folder if it doesn't exist
+		if not os.path.exists("./Profiles/"):
+			os.mkdir("./Profiles/")
+		
+		
 		#Make the plaintext folder if it doesn't exist
 		if not os.path.exists("./Plaintext/"):
 			os.mkdir("./Plaintext/")
@@ -123,12 +128,12 @@ class RSA_sandbox():
 		folder_name = input("Enter profile folder name (Ex: Arons_Settings): ")
 		
 		#If folder already exists, remove it so we can overwrite
-		if os.path.exists("./" + str(folder_name)):
+		if os.path.exists("./Profiles/" + str(folder_name)):
 			for root, dirs, files in os.walk("./" + str(folder_name)):
 				for file in files:
 					os.remove(os.path.join(root, file))
 		else:
-			os.makedirs(folder_name)
+			os.makedirs("./Profiles/" + folder_name)
 		#Call the functions to save all system data: objects, keys, primes, plaintext, etc
 		save_encryption_objects(folder_name, self.encryption_objects)
 		save_key_data(folder_name, self.encryption_keys)
@@ -150,7 +155,7 @@ class RSA_sandbox():
 		#Get the folder name from the user
 		folder_name = input("Enter profile folder name (Ex: Arons_Settings): ")
 		#See if it exists
-		if os.path.isdir("./" + str(folder_name)):
+		if os.path.isdir("./Profiles/" + str(folder_name)):
 			#Indicate if the folder was found
 			print("Folder '", str(folder_name), "' found! Loading settings...")
 			#Call the load functions to reload system data
