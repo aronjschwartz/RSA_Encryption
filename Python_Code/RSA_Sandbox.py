@@ -1059,7 +1059,7 @@ class RSA_sandbox():
 				self.system_data_management()
 			elif((choice == "M") or (choice == "m")):
 				self.display_main_menu()
-			elif((choice == "H") or (choice == "h")):
+			elif((choice == "H") or (choice == "h") or (choice == "help")):
 				self.help_topics()
 			elif((choice == "q") or (choice == "Q")):
 				print("Goodbye!")
