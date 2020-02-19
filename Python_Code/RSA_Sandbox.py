@@ -21,6 +21,7 @@ from datetime import datetime
 import time
 import math
 import shutil
+import random
 
 class RSA_sandbox():
 	
@@ -844,7 +845,8 @@ class RSA_sandbox():
 				with open("./Results/Septuple_Comparisons/Sept_Compare_" + str(current_time) + ".csv", 'w', newline='')  as f:
 					writer = csv.writer(f)
 					writer.writerow(["Septuple", "E Value", "Holes Found", "Transparency"])
-					for septuple in self.encryption_objects:
+					for index, septuple in enumerate(self.encryption_objects):
+						print(str(round((index/len(self.encryption_objects)*100), 2)), "% complete")
 						#Analyze the holes in the septuple
 						holes_num = septuple.search_holes()
 						#Round transparency to nearest hundreth
@@ -950,7 +952,20 @@ class RSA_sandbox():
 				
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
+			#Create septs from primes
 			elif (choice == "3"):
+				for i in self.prime_list:
+					for j in self.prime_list:
+						if i > j:
+							e_val = int(random.choice(self.public_keys))
+							temp_object = encrypt.encryption_set(p=i, q=j, custom_e=e_val)
+							if temp_object not in self.encryption_objects:
+								self.encryption_objects.append(temp_object)
+							self.add_key_to_septuple(temp_object, e_val)
+							print("Created septuple: ", temp_object.get_septuple())
+				self.septuple_selection_menu()
+				choice = self.selection_prompt()
+			elif (choice == "4"):
 				confirm = input("Erase all seputples? [Y/N]: ")
 				if ((confirm == "y") or (confirm == "Y")):
 					self.encryption_objects = []
@@ -960,7 +975,7 @@ class RSA_sandbox():
 				self.encryption_objects.clear()
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
-			elif (choice == "4"):
+			elif (choice == "5"):
 				self.view_septuples()
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()

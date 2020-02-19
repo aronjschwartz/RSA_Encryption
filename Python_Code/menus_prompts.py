@@ -73,8 +73,9 @@ def septuple_selection_menu():
 	print("\n\n******** SEPTUPLE MANAGEMENT MENU ********\n")
 	print("1 - Change active septuple")
 	print("2 - Add Septuple")
-	print("3 - Clear septuples")
-	print("4 - View septuples")
+	print("3 - Create septuples from primes")
+	print("4 - Clear septuples")
+	print("5 - View septuples")
 	print("Q - Return to main menu\n")
 	return
 	
