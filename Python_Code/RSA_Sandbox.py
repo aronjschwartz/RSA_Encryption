@@ -920,11 +920,7 @@ class RSA_sandbox():
 				holes_search_menu()
 				choice = selection_prompt()
 		
-		return
-		
-	def output_results(self):
-		print("Result output and visualization selected")
-	
+		return	
 
 	#*************************************************************************
 	#																		 *
@@ -966,15 +962,25 @@ class RSA_sandbox():
 			#Create septs from primes
 			elif (choice == "3"):
 				print("\nGenerating septuples....")
+				created = 0
 				for i in self.prime_list:
 					for j in self.prime_list:
-						if i > j:
+						if j > i:
 							e_val = int(random.choice(self.public_keys))
-							temp_object = encrypt.encryption_set(p=i, q=j, custom_e=e_val)
-							if temp_object not in self.encryption_objects:
+							temp_object = encrypt.encryption_set(p=i, q=j, custom_e=e_val)	
+														
+							found = False
+							for sept in self.encryption_objects:
+								if temp_object.get_septuple() == sept.get_septuple():
+									found = True
+									break
+							if not found:
 								self.encryption_objects.append(temp_object)
 							self.add_key_to_septuple(temp_object, e_val)
+							created +=1
 							#print("Created septuple: ", temp_object.get_septuple())
+				print("\nGenerated ", str(created), " septuples")
+				print()
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
 			elif (choice == "4"):
