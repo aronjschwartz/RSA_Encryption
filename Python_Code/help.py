@@ -58,21 +58,43 @@ def analyze_holes_help():
 	
 def manage_septuples_help():
 	print("************* Septuple Management Help Overview **************")
-	print("The septuple management menu allows user to create septuples, as well as change the active septuple")
+	print("The septuple management menu allows user to create septuples, change the active septuple,")
+	print("create septuples from primes, clear the septuple data, or simply view all septuples")
 	print("\nFor a more detailed overview, please see the RSA Sandbox user manual.\n")
 
 def plaintext_selection_help():
-	print("Plaintext help")
+	print("************* Plaintext Management Help Overview **************")
+	print("The plaintext managment menu allows a user to select a plaintext file to encrypt")
+	print("The files are read out of the Plaintext folder, and should be text files")
 	print("\nFor a more detailed overview, please see the RSA Sandbox user manual.\n")
 	
 def display_system_data_help():
-	print("Display data help")
+	print("************* Display System Data Help Overview **************")
+	print("The display system data option allows a user to view all septuples, primes,")
+	print("keys, and plaintext data loaded into the program.  Users can choose to display")
+	print("data verbosely, which will show key data for each septuple")
 	print("\nFor a more detailed overview, please see the RSA Sandbox user manual.\n")
 	
 def save_load_data_help():
-	print("Save load help")
+	print("************* Save/Load System Data Help Overview **************")
+	print("The save/load menu allows saving or loading of user profiles containing")
+	print("system data.")
 	print("\nFor a more detailed overview, please see the RSA Sandbox user manual.\n")
 	
 def RSA_Sandbox_overview():
-	print("overview help")
+	print("************* RSA Sandbox Help Overview **************")
+	print("The RSA Sandbox is a research tool that enables users to explore and experiment with the RSA")
+	print("encryption algorithm.  The program allows a user to create RSA encryption 'septuples', generate ")
+	print("prime numbers, create encryption keys, and combine the three to search for fixed point patterns.")
+	print("In addition, users can encrypt plaintext to file, output results in comma separated format, and ")
+	print("save all system data to a user profile to pick up again later.")
 	print("\nFor a more detailed overview, please see the RSA Sandbox user manual.\n")
+	
+	
+	
+	
+	
+	
+	
+	
+	

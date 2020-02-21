@@ -1044,9 +1044,9 @@ class RSA_sandbox():
 			elif(choice == "5"):
 				manage_primes_help()
 			elif(choice == "6"):
-				analyze_holes_help()
-			elif(choice == "7"):
 				plaintext_selection_help()
+			elif(choice == "7"):
+				analyze_holes_help()
 			elif(choice == "8"):
 				display_system_data_help()
 			elif(choice == "9"):
