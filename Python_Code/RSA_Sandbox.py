@@ -242,17 +242,6 @@ class RSA_sandbox():
 				self.load_data_profile()
 				system_data_menu()
 				choice = selection_prompt()
-			#Load septuples
-			elif(choice == "3"):
-				print("Load septuples")
-				system_data_menu()
-				choice = selection_prompt()
-			#Load keys
-			elif(choice == "4"):
-				print("Load keys")
-				system_data_menu()
-				choice = selection_prompt()
-		
 			#Quit to main menu
 			elif((choice == "q") or (choice == "Q")):
 				break
@@ -272,16 +261,23 @@ class RSA_sandbox():
 	
 	def display_system_data(self):
 		#Septuples with keys, tabbed output
-		count = 1
-		print("******* DISPLAYING SYSTEM DATA ********")
-		self.view_septuples_with_keys()
+		choice = input("View keys verbosely? [Y/N]:")
+		if ((choice == "y") or (choice == "Y")):
+			print("******* DISPLAYING SYSTEM DATA ********")
+			self.view_septuples_with_keys()
+
+		else:
+			print()
+			count = 0
+			for key, value in self.encryption_keys.items():
+				print(str(count), "-", str(key.get_septuple()), "(", str(len(value)), " keys loaded)")
+				count +=1
 		#Primes
 		print("************ Primes *************")
 		if len(self.prime_list) > 0:
-			first_last = [self.prime_list[0], self.prime_list[-1]]
-			print("All primes between: ", str(first_last))
-			print()
-		
+				first_last = [self.prime_list[0], self.prime_list[-1]]
+				print("All primes between: ", str(first_last))
+				print()
 		print("Plaintext loaded from file: ", str(self.plain_text_file))
 		print()
 		return
@@ -463,7 +459,8 @@ class RSA_sandbox():
 					check_contents = self.manage_plaintext()
 					if check_contents is None:
 						return
-			
+				else:
+					self.manage_plaintext()
 				choice = input("Use active object? " + str(self.active_encryption_object.get_septuple()) + "? [Y/N]: ")
 				if((choice == "Y") or (choice == "y")):
 					self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
@@ -815,17 +812,18 @@ class RSA_sandbox():
 			#Analyze the active septuple
 			if(choice == "1"):
 				if self.active_encryption_object is None:
-					choice = input("No object loaded! Create one? [Y/N]: ")
-					if ((choice == "y") or (choice == "Y")):
-						septuple = self.create_septuple_user_input()
-						if septuple is None:
-							print("Object creation failed!")
-							break
-						else:
-							self.encryption_objects.append(septuple)
-				
-						if len(self.encryption_objects) == 1:
-							self.active_encryption_object = septuple
+					if len(self.encryption_objects) == 0:
+						choice = input("No objects loaded! Create one? [Y/N]: ")
+						if ((choice == "y") or (choice == "Y")):
+							septuple = self.create_septuple_user_input()
+							if septuple is None:
+								print("Object creation failed!")
+								break
+							else:
+								self.encryption_objects.append(septuple)
+
+					elif len(self.encryption_objects) >= 1:
+						self.active_encryption_object = self.encryption_objects[0]
 					else:
 						print("Returning to main menu")
 						break

@@ -90,8 +90,8 @@ def primes_selection_menu():
 	
 def holes_search_menu():
 	print("\n\n******** FIXED POINT ANALYSIS MENU ********\n")
-	print("1 - Analyze septuple")
-	print("2 - Compare septuples")
+	print("1 - Analyze active septuple")
+	print("2 - Compare all septuples")
 	print("3 - Generate transparency profile")
 	print("Q - Return to main menu\n")
 	return
@@ -100,8 +100,6 @@ def system_data_menu():
 	print("\n\n******** SYSTEM DATA MANAGEMENT MENU ********\n")
 	print("1 - Save data to profile")
 	print("2 - Load data from profile")
-	print("3 - Load septuples")
-	print("4 - Load keys")
 	print("Q - Return to main menu\n")
 	return
 	
