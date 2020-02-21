@@ -482,7 +482,6 @@ class RSA_sandbox():
 						break
 					self.cipher_text = septuple.encrypt_int_list(get_ascii_list(self.plain_text))
 					decrypted = septuple.decrypt_int_list(self.cipher_text)
-					print("The cipher is: ",  get_string_from_ascii(self.cipher_text))
 					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(septuple.get_n()) + "," + str(septuple.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
 					
 					print("\n\nThe plain text is: ", self.plain_text)
