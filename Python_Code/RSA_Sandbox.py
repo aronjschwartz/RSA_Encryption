@@ -22,6 +22,7 @@ import time
 import math
 import shutil
 import random
+import collections
 
 class RSA_sandbox():
 	
@@ -48,15 +49,19 @@ class RSA_sandbox():
 		#The encryption keys exist in a dictionary 
 		self.encryption_keys = {} 
 		self.public_keys = [3, 5, 17, 257, 65537]
+		try:
+			#Make the profiles folder if it doesn't exist
+			if not os.path.exists("./Profiles/"):
+				os.mkdir("./Profiles/")
+		except Exception as e:
+			print("Error creating folder 'Profiles': ", str(e))
 		
-		#Make the profiles folder if it doesn't exist
-		if not os.path.exists("./Profiles/"):
-			os.mkdir("./Profiles/")
-		
-		
-		#Make the plaintext folder if it doesn't exist
-		if not os.path.exists("./Plaintext/"):
-			os.mkdir("./Plaintext/")
+		try:
+			#Make the plaintext folder if it doesn't exist
+			if not os.path.exists("./Plaintext/"):
+				os.mkdir("./Plaintext/")
+		except Exception as e:
+			print("Error creating folder 'Profiles': ", str(e))
 			
 		#Set the plaintext folder variable
 		self.plaintext_folder = "./Plaintext/"
@@ -563,12 +568,12 @@ class RSA_sandbox():
 	def add_key_to_septuple(self, septuple, key):
 		if septuple not in self.encryption_keys:
 			self.encryption_keys[septuple] = [key]
-			print("Key ", str(key), " added to septuple ", str(septuple.get_septuple()))
+			#print("Key ", str(key), " added to septuple ", str(septuple.get_septuple()))
 		elif key in self.encryption_keys[septuple]:
 			print("Key ", str(key), " already exists!")
 		else:
 			self.encryption_keys[septuple].append(key)
-			print("Key ", str(key), " appended to septuple ", str(septuple.get_septuple()))
+			#print("Key ", str(key), " appended to septuple ", str(septuple.get_septuple()))
 		return
 	
 	#****************************************************************
@@ -838,7 +843,7 @@ class RSA_sandbox():
 			#Compare all septuples, display results sorted by transparency
 			elif(choice == "2"):
 				result_transparency_dict = {}
-				transparency_list = []
+				
 				now = datetime.now()
 				current_time = now. strftime("%H_%M_%S")
 				#Gather results for all the septuples
@@ -852,16 +857,20 @@ class RSA_sandbox():
 						#Round transparency to nearest hundreth
 						transparency = round((float(holes_num)/(septuple.n -1))*100, 2)
 						result_string = self.format_results(septuple.get_septuple(), holes_num, transparency)
-						result_transparency_dict[transparency] = result_string
-						transparency_list.append(transparency)
+		
+						if transparency not in result_transparency_dict:
+							result_transparency_dict[transparency] = [result_string]
+						else:
+							result_transparency_dict[transparency].append(result_string)
+							
+							
+							
 						writer.writerow([septuple.get_septuple(), septuple.get_e(), holes_num, transparency])
 				#Display the results sorted by transparency and write to output folder
 				print("\n\n*********** RANKED RESULTS **************")
-				for transparency in list(reversed(sorted(transparency_list))):
-					for key, value in result_transparency_dict.items():
-						if key == transparency:
-							print(value, "%")
-				print()
+				for key in reversed(sorted(result_transparency_dict)):
+					for entry in result_transparency_dict[key]:
+						print(entry, "%") 
 				holes_search_menu()
 				choice = selection_prompt()
 			#Generate transparency profile
@@ -924,8 +933,10 @@ class RSA_sandbox():
 	#*************************************************************************
 	
 	def manage_septuples(self):
-		print("Specify septuples selected")
-		self.view_septuples()
+		if len(self.encryption_objects) < 20:
+			self.view_septuples()
+		else:
+			print("\n**** ", str(len(self.encryption_objects)), " septuples loaded ****")
 		self.septuple_selection_menu()
 		choice = self.selection_prompt()
 		while(1):
@@ -954,6 +965,7 @@ class RSA_sandbox():
 				choice = self.selection_prompt()
 			#Create septs from primes
 			elif (choice == "3"):
+				print("\nGenerating septuples....")
 				for i in self.prime_list:
 					for j in self.prime_list:
 						if i > j:
@@ -962,7 +974,7 @@ class RSA_sandbox():
 							if temp_object not in self.encryption_objects:
 								self.encryption_objects.append(temp_object)
 							self.add_key_to_septuple(temp_object, e_val)
-							print("Created septuple: ", temp_object.get_septuple())
+							#print("Created septuple: ", temp_object.get_septuple())
 				self.septuple_selection_menu()
 				choice = self.selection_prompt()
 			elif (choice == "4"):
