@@ -173,8 +173,6 @@ class RSA_sandbox():
 			#Load up keys for the loaded septuples, in case some were added manually.  This ensures each septuple has its key entered in the system dictionary
 			for septuple in self.encryption_objects:
 				self.add_key_to_septuple(septuple, septuple.get_e())
-			
-			
 			print("******** Load Successful! **********")
 		#Error message if folder not found
 		else:
@@ -267,11 +265,7 @@ class RSA_sandbox():
 			self.view_septuples_with_keys()
 
 		else:
-			print()
-			count = 0
-			for key, value in self.encryption_keys.items():
-				print(str(count), "-", str(key.get_septuple()), "(", str(len(value)), " keys loaded)")
-				count +=1
+			self.view_septuples()
 		#Primes
 		print("************ Primes *************")
 		if len(self.prime_list) > 0:
@@ -549,7 +543,7 @@ class RSA_sandbox():
 	def show_keys_for_septuple(self, septuple):
 		for key, value in self.encryption_keys.items():
 			if key.get_septuple() == septuple.get_septuple():
-				for encryption_key in self.encryption_keys[key]:
+				for encryption_key in value:
 					print("(", key.get_n(), ",",encryption_key, ")")
 		return
 	
@@ -562,14 +556,19 @@ class RSA_sandbox():
 	#*********************************************************************************************
 	
 	def add_key_to_septuple(self, septuple, key):
-		if septuple not in self.encryption_keys:
+		need_to_add = True
+		for dict_key, value in self.encryption_keys.items():
+			#Septuple exists already
+			if septuple.get_septuple() == dict_key.get_septuple():
+				if key in value:
+					need_to_add = False
+					break
+				else:
+					self.encryption_keys[septuple].append(key)
+					need_to_add = False
+					break		
+		if (need_to_add == True):	
 			self.encryption_keys[septuple] = [key]
-			#print("Key ", str(key), " added to septuple ", str(septuple.get_septuple()))
-		elif key in self.encryption_keys[septuple]:
-			print("Key ", str(key), " already exists!")
-		else:
-			self.encryption_keys[septuple].append(key)
-			#print("Key ", str(key), " appended to septuple ", str(septuple.get_septuple()))
 		return
 	
 	#****************************************************************

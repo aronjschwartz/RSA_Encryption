@@ -163,7 +163,6 @@ class encryption_set():
 		count = 2
 		while(1):
 			if ((int(self.encrypt_int(count))) == count):
-				print("Hole found at value: ", str(count))
 				holes +=1
 			count +=1
 			if count == int((self.n + 1)/2):   #Take advantage of symmetry for faster search, only search up to n/2 and double it
