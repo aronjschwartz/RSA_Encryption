@@ -578,11 +578,12 @@ class RSA_sandbox():
 	#****************************************************************
 	
 	def manage_keys(self):  
-		print("Key generation selected")
 		self.key_generation_menu()
 		choice = selection_prompt()
 		while(1):
+			#Add key to a loaded septuple
 			if (choice == "1"):
+				#Ensure atleast one septuple is loaded
 				if (len(self.encryption_objects) == 0):
 					print("No septuples loaded!")
 					self.key_generation_menu()
@@ -619,7 +620,11 @@ class RSA_sandbox():
 				else:
 					self.view_septuples()
 					sept_choice = input("Select septuple to swap key: ")
-					self.show_keys_for_septuple(self.encryption_objects[int(sept_choice)])
+					try:
+						self.show_keys_for_septuple(self.encryption_objects[int(sept_choice)])
+					except IndexError:
+						print("Invalid choice!")
+						break
 					key_choice = selection_prompt()
 					old_septuple = self.encryption_objects[int(sept_choice)]
 					found = False
@@ -695,7 +700,11 @@ class RSA_sandbox():
 			elif (choice == "4"):
 				self.view_septuples()
 				choice = input("Select septuple to view keys: ")
-				self.show_keys_for_septuple(self.encryption_objects[int(choice)])
+				try:
+					self.show_keys_for_septuple(self.encryption_objects[int(choice)])
+				except IndexError:
+					print("Invalid choice!")
+					break
 				self.key_generation_menu()
 				choice = selection_prompt()
 			#Add primes to specific septuple
