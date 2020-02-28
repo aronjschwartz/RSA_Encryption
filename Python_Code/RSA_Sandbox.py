@@ -895,7 +895,11 @@ class RSA_sandbox():
 				for index, object in enumerate(self.encryption_objects):
 					print(str(index) + " - " + str(object.get_septuple()))
 				choice = input("Select septuple: ")
-				sept = self.encryption_objects[int(choice)]
+				try:
+					sept = self.encryption_objects[int(choice)]
+				except IndexError:
+					print("Invalid choice!")
+					break
 				now = datetime.now()
 				current_time = now. strftime("%H_%M_%S")
 				with open("./Results/Transparency_Profiles/Trans_Profile_" + str(current_time) + ".csv", 'w', newline='')  as f:
