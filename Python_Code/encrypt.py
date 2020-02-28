@@ -159,16 +159,21 @@ class encryption_set():
 	#Function to search for all fixed points in the septuple
 	def search_holes(self):
 		#Hole counter
-		holes = 0
+		holes_list = []
+		left_holes = []
+		right_holes = []
 		count = 2
 		while(1):
 			if ((int(self.encrypt_int(count))) == count):
-				holes +=1
+				left_holes.append(count)
+				right_holes.append(int(float(self.n/2) + (float(self.n/2) - count)))
 			count +=1
-			if count == int((self.n + 1)/2):   #Take advantage of symmetry for faster search, only search up to n/2 and double it
+			if count == int(self.n + 1)/2:   #Take advantage of symmetry for faster search, only search up to n/2 and double it
 				break
-		return holes*2
-	
+		
+		right_holes = list(reversed(right_holes))
+		holes_list = left_holes + right_holes
+		return [len(holes_list), holes_list]
 	
 	#Function to dump out internal variables for the encryption object
 	def to_String(self):

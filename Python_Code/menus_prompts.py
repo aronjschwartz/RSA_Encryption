@@ -40,6 +40,7 @@ def display_main_menu():
 	print("7  - Analyze Fixed Points")
 	print("8  - Display System Data")
 	print("9  - Save/Load System data")
+	print("10 - System Options")
 	print("M  - Reload main menu")
 	print("H  - Help Topics")
 	print("Q  - Exit program\n")
@@ -109,6 +110,13 @@ def key_generation_menu():
 	print("4 - View keys")
 	print("5 - Add keys from prime list")
 	print("6 - Add keys to all septuples from prime list")
+	print("Q - Return to main menu\n")
+	return 
+
+def system_options_menu():
+	print("\n\n******** SYSTEM OPTIONS MENU ********\n")
+	print("1 - Toggle Verbose mode")
+	print("2 - Toggle Hex Mode")
 	print("Q - Return to main menu\n")
 	return 
 

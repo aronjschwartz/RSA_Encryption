@@ -18,6 +18,7 @@ from encryption_test import *
 from save_load import *
 from help import *
 from datetime import datetime
+from sandbox_options import *
 import time
 import math
 import shutil
@@ -41,6 +42,9 @@ class RSA_sandbox():
 		self.cipher_text = None
 		self.cipher_text_file = None
 		self.active_encryption_object = None
+		
+		#Instantiate the system options
+		self.options = sandbox_options()
 		
 		#Store the encryption objects and primes inside internal lists
 		self.encryption_objects = []
@@ -564,7 +568,7 @@ class RSA_sandbox():
 					need_to_add = False
 					break
 				else:
-					self.encryption_keys[septuple].append(key)
+					self.encryption_keys[dict_key].append(key)
 					need_to_add = False
 					break		
 		if (need_to_add == True):	
@@ -798,12 +802,18 @@ class RSA_sandbox():
 				choice = self.selection_prompt()
 		return
 	
-	def format_results_with_keys(self, septuple, holes_num, transparency):
-		result_string = "Septuple: " + str(septuple) + ", Key: " + str(septuple[4]) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
+	def format_results_with_keys(self, septuple, holes_num, transparency, holes_list):
+		if self.options.check_verbose():
+			result_string = "Septuple: " + str(septuple) + ", Key: " + str(septuple[4]) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency) + "%\n" + str(holes_list)
+		else:
+			result_string = "Septuple: " + str(septuple) + ", Key: " + str(septuple[4]) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
 		return result_string
 		
-	def format_results(self, septuple, holes_num, transparency):
-		result_string = "Septuple: " + str(septuple) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
+	def format_results(self, septuple, holes_num, transparency, holes_list):
+		if self.options.check_verbose():
+			result_string = "Septuple: " + str(septuple) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency) + "%\n" + str(holes_list)
+		else:
+			result_string = "Septuple: " + str(septuple) + ", Holes found: " + str(holes_num) + ", Transparency: " + str(transparency)
 		return result_string
 	
 	#****************************************************************
@@ -836,12 +846,11 @@ class RSA_sandbox():
 						break
 				print("Analyzing active septuple: ", self.active_encryption_object.get_septuple())
 				#Analyze the holes in the septuple
-				holes_num = self.active_encryption_object.search_holes()
-				
+				holes_num, holes_list = self.active_encryption_object.search_holes()
 				#Round transparency to nearest hundreth
 				transparency = round((float(holes_num)/(self.active_encryption_object.n -1))*100, 2)
 				print("***** Results *****: ")
-				print(self.format_results(self.active_encryption_object.get_septuple(), holes_num, transparency), "%")
+				print(self.format_results(self.active_encryption_object.get_septuple(), holes_num, transparency, holes_list))
 				
 				holes_search_menu()
 				choice = selection_prompt()
@@ -854,14 +863,14 @@ class RSA_sandbox():
 				#Gather results for all the septuples
 				with open("./Results/Septuple_Comparisons/Sept_Compare_" + str(current_time) + ".csv", 'w', newline='')  as f:
 					writer = csv.writer(f)
-					writer.writerow(["Septuple", "E Value", "Holes Found", "Transparency"])
+					writer.writerow(["Septuple", "E Value", "Holes Found", "Transparency", "Holes List"])
 					for index, septuple in enumerate(self.encryption_objects):
 						print(str(round((index/len(self.encryption_objects)*100), 2)), "% complete")
 						#Analyze the holes in the septuple
-						holes_num = septuple.search_holes()
+						holes_num, holes_list = septuple.search_holes()
 						#Round transparency to nearest hundreth
 						transparency = round((float(holes_num)/(septuple.n -1))*100, 2)
-						result_string = self.format_results(septuple.get_septuple(), holes_num, transparency)
+						result_string = self.format_results(septuple.get_septuple(), holes_num, transparency, holes_list)
 		
 						if transparency not in result_transparency_dict:
 							result_transparency_dict[transparency] = [result_string]
@@ -870,12 +879,12 @@ class RSA_sandbox():
 							
 							
 							
-						writer.writerow([septuple.get_septuple(), septuple.get_e(), holes_num, transparency])
+						writer.writerow([septuple.get_septuple(), septuple.get_e(), holes_num, transparency, holes_list])
 				#Display the results sorted by transparency and write to output folder
 				print("\n\n*********** RANKED RESULTS **************")
 				for key in reversed(sorted(result_transparency_dict)):
 					for entry in result_transparency_dict[key]:
-						print(entry, "%") 
+						print(entry) 
 				holes_search_menu()
 				choice = selection_prompt()
 			#Generate transparency profile
@@ -891,26 +900,27 @@ class RSA_sandbox():
 				current_time = now. strftime("%H_%M_%S")
 				with open("./Results/Transparency_Profiles/Trans_Profile_" + str(current_time) + ".csv", 'w', newline='')  as f:
 					writer = csv.writer(f)
-					writer.writerow(["Septuple", "Holes_Found", "E Value", "Transparency"])
+					writer.writerow(["Septuple", "Holes_Found", "E Value", "Transparency", "Holes List"])
 					for key, value in self.encryption_keys.items():
 						if key.get_septuple() == sept.get_septuple():
 							for index, encryption_key in enumerate(value):
 								print("Checking key: ", str(encryption_key), "(", str(round((index/len(value)*100), 2)), "% complete)")
 								temp_sept = encrypt.encryption_set(p=sept.get_p(), q=sept.get_q(), custom_e=int(encryption_key))
-								holes_num = temp_sept.search_holes()
+								holes_num, holes_list = temp_sept.search_holes()
+		
 								#Round transparency to nearest hundreth
 								transparency = round((float(holes_num)/(sept.n -1))*100, 2)
-								result_string = self.format_results_with_keys(temp_sept.get_septuple(), holes_num, transparency)
+								result_string = self.format_results_with_keys(temp_sept.get_septuple(), holes_num, transparency, holes_list)
 								if transparency in result_transparency_dict:
 									result_transparency_dict[transparency].append(result_string)
 								else:
 									result_transparency_dict[transparency] = [result_string]
-								writer.writerow([temp_sept.get_septuple(),  holes_num, temp_sept.get_e(), transparency])
+								writer.writerow([temp_sept.get_septuple(),  holes_num, temp_sept.get_e(), transparency, holes_list])
 				#Display the results sorted by transparency
 				print("\n\n*********** RANKED RESULTS **************")
 				for key, value in reversed(sorted(result_transparency_dict.items())):
 					for entry in value:
-						print(entry, "%")
+						print(entry)
 		
 							
 				
@@ -968,7 +978,8 @@ class RSA_sandbox():
 			elif (choice == "3"):
 				print("\nGenerating septuples....")
 				created = 0
-				for i in self.prime_list:
+				for index, i in enumerate(self.prime_list):
+					print(str(round((index/len(self.prime_list)*100), 2)), "% complete")
 					for j in self.prime_list:
 						if j > i:
 							e_val = int(random.choice(self.public_keys))
@@ -1008,8 +1019,29 @@ class RSA_sandbox():
 				print("Invalid choice!")
 				choice = self.selection_prompt()
 		return
-		
-		
+	
+	def system_options(self):
+		system_options_menu()
+		self.options.display_options_status()
+		choice = self.selection_prompt()
+		while(1):
+			if (choice == "1"):
+				self.options.toggle_verbose()
+				system_options_menu()
+				self.options.display_options_status()
+				choice = self.selection_prompt()
+			elif (choice == "2"):
+				self.options.toggle_hex()
+				system_options_menu()
+				self.options.display_options_status()
+				choice = self.selection_prompt()
+			elif ((choice == "Q") or (choice == "q")):
+				break
+			else:
+				print("Invalid choice!")
+				system_options_menu()
+				self.options.display_options_status()
+				choice = self.selection_prompt()
 	def analyze_septuples(self):	
 		print("Analyze septuple selected")
 		
@@ -1095,6 +1127,8 @@ class RSA_sandbox():
 				self.display_system_data()
 			elif(choice == "9"):
 				self.system_data_management()
+			elif(choice == "10"):
+				self.system_options()
 			elif((choice == "M") or (choice == "m")):
 				self.display_main_menu()
 			elif((choice == "H") or (choice == "h") or (choice == "help")):
