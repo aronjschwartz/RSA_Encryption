@@ -82,8 +82,9 @@ def primes_selection_menu():
 	print("\n\n******** PRIMES MANAGEMENT MENU ********\n")
 	print("1 - Generate prime list")
 	print("2 - Generate prime list (display only)")
-	print("3 - Clear prime list")
-	print("4 - Display prime list")
+	print("3 - Add custom prime to list")
+	print("4 - Clear prime list")
+	print("5 - Display prime list")
 	print("Q - Return to main menu\n")
 	return
 	
@@ -92,6 +93,7 @@ def holes_search_menu():
 	print("1 - Analyze active septuple")
 	print("2 - Compare all septuples")
 	print("3 - Generate transparency profile")
+	print("4 - Compare all septuples and keys")
 	print("Q - Return to main menu\n")
 	return
 	

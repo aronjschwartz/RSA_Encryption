@@ -81,7 +81,8 @@ class RSA_sandbox():
 			os.mkdir("./Results/Septuple_Comparisons")
 		if not os.path.exists("./Results/Transparency_Profiles"):
 			os.mkdir("./Results/Transparency_Profiles")
-			
+		if not os.path.exists("./Results/Full_Septuple_Key_Comparisons"):
+			os.mkdir("./Results/Full_Septuple_Key_Comparisons")
 	
 		#Finish the initialization with the welcome message and display the main menu 
 		self.welcome_message()
@@ -768,10 +769,9 @@ class RSA_sandbox():
 	#*************************************************************************
 	
 	def manage_primes(self):
-		print("Prime number generation selected...")
 		self.primes_selection_menu()
+		choice = self.selection_prompt()
 		while(1):
-			choice = self.selection_prompt()
 			if (choice == "1"):		
 				lower_limit = input("Enter lower limit for prime generation: ")
 				upper_limit = input("Enter upper limit for prime generation: ")
@@ -781,19 +781,46 @@ class RSA_sandbox():
 				print(prime_list)
 				print("\nGenerated ", str(len(prime_list)), " primes")
 				print()
+				self.primes_selection_menu()
+				choice = self.selection_prompt()
 			elif (choice == "2"):
 				lower_limit = input("Enter lower limit for prime generation: ")
 				upper_limit = input("Enter upper limit for prime generation: ")
 				prime_list = self.primes(int(lower_limit), int(upper_limit))
 				print(prime_list)
+				self.primes_selection_menu()
+				choice = self.selection_prompt()
 			elif (choice == "3"):
+				choice = input("Enter prime to add (empty return when done): ")
+				while(1):
+					if len(str(choice)) == 0:
+						break
+					elif len(str(choice)) > 0:
+						try:
+							if self.is_prime(int(choice)):
+								self.prime_list.append(int(choice))
+								print(str(choice), " appended to prime list")
+								choice = input("Enter prime to add (empty return when done): ")
+							else:
+								print(str(choice), " is not a prime number!")
+								choice = input("Enter prime to add (empty return when done): ")
+						except ValueError:
+							print("Prime integers only!")
+							choice = input("Enter prime to add (empty return when done): ")
+				self.primes_selection_menu()
+				choice = self.selection_prompt()
+			elif (choice == "4"):
 				print("Erasing prime list...")
 				self.prime_list = []
-			elif(choice == "4"):
+				self.primes_selection_menu()
+				choice = self.selection_prompt()
+			elif(choice == "5"):
 				if len(self.prime_list) > 0:
 					print(self.prime_list)
 				else:
 					print("List is empty!")
+				self.primes_selection_menu()
+				choice = self.selection_prompt()
 			elif ((choice == "Q") or (choice == "q")):
 				break
 			else:
@@ -925,13 +952,45 @@ class RSA_sandbox():
 				for key, value in reversed(sorted(result_transparency_dict.items())):
 					for entry in value:
 						print(entry)
-		
-							
-				
 				holes_search_menu()
 				choice = selection_prompt()
+			#Compare all keys and septs
+			elif (choice == "4"):
+				result_transparency_dict = {}
+				now = datetime.now()
+				current_time = now. strftime("%H_%M_%S")
+				with open("./Results/Full_Septuple_Key_Comparisons/FullAnalysis_" + str(current_time) + ".csv", 'w', newline='')  as f:
+					writer = csv.writer(f)
+					writer.writerow(["Septuple", "Holes_Found", "E Value", "Transparency", "Holes List"])
+					count = 1
+					for key, value in self.encryption_keys.items():
+						for index, encryption_key in enumerate(value):
+							print(str(round((count/len(self.encryption_keys)*100), 2)), "% complete")
+							temp_sept = encrypt.encryption_set(p=key.get_p(), q=key.get_q(), custom_e=int(encryption_key))
+							holes_num, holes_list = temp_sept.search_holes()
+	
+							#Round transparency to nearest hundreth
+							transparency = round((float(holes_num)/(temp_sept.n -1))*100, 2)
+							result_string = self.format_results_with_keys(temp_sept.get_septuple(), holes_num, transparency, holes_list)
+							if transparency in result_transparency_dict:
+								result_transparency_dict[transparency].append(result_string)
+							else:
+								result_transparency_dict[transparency] = [result_string]
+								
+							#Excel cant put more than 32767 chars in a cell.  Limit this, otherwise the output file format gets messed up
+							if len(str(holes_list)) >= 16702:
+								writer.writerow([temp_sept.get_septuple(),  holes_num, temp_sept.get_e(), transparency, "HOLE LIST TOO LARGE FOR CSV FILE"])
+							else:
+								writer.writerow([temp_sept.get_septuple(),  holes_num, temp_sept.get_e(), transparency, holes_list])
 				
-			
+						count +=1
+				#Display the results sorted by transparency
+				print("\n\n*********** RANKED RESULTS **************")
+				for key, value in reversed(sorted(result_transparency_dict.items())):
+					for entry in value:
+						print(entry)
+				holes_search_menu()
+				choice = selection_prompt()
 			elif((choice == "q") or (choice == "Q")):
 				break
 			else:
