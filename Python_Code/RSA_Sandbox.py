@@ -798,8 +798,11 @@ class RSA_sandbox():
 					elif len(str(choice)) > 0:
 						try:
 							if self.is_prime(int(choice)):
-								self.prime_list.append(int(choice))
-								print(str(choice), " appended to prime list")
+								if int(choice) not in self.prime_list:
+									self.prime_list.append(int(choice))
+									print(str(choice), " appended to prime list")
+								else:
+									print(str(choice), " already in the prime list!")
 								choice = input("Enter prime to add (empty return when done): ")
 							else:
 								print(str(choice), " is not a prime number!")
