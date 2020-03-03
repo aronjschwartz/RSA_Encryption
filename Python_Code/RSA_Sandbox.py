@@ -6,7 +6,7 @@
 #* strength with regards to fixed point occurence.
 #*
 #* Author: Aron Schwartz
-#* Last Edit: 2/2/2020
+#* Last Edit: 3/2/2020
 #*
 #********************************************************
 
@@ -283,7 +283,7 @@ class RSA_sandbox():
 		
 	#************************************************************************************
 	#																					*
-	#  view_septuples(): Displays all septuples loaded innto system data, as well as    *
+	#  view_septuples(): Displays all septuples loaded into system data, as well as    *
 	#					 information regarding the active septuple						*
 	#															    					*
 	#************************************************************************************
