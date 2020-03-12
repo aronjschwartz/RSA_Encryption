@@ -191,12 +191,65 @@ class RSA_sandbox():
 			out = out + str(hex(ord(val)))
 		return out
 	
+	def get_hex_object_from_char(self, char):
+		if (char == "0"):
+			return 0x0
+		elif (char == "1"):
+			return 0x1
+		elif (char == "2"):
+			return 0x2
+		elif (char == "3"):
+			return 0x3
+		elif (char == "4"):
+			return 0x4
+		elif (char == "5"):
+			return 0x5
+		elif (char == "6"):
+			return 0x6
+		elif (char == "7"):
+			return 0x7
+		elif (char == "8"):
+			return 0x8
+		elif (char == "9"):
+			return 0x9
+		elif (char == "a"):
+			return 0xa
+		elif (char == "b"):
+			return 0xb
+		elif (char == "c"):
+			return 0xc
+		elif (char == "d"):
+			return 0xd
+		elif (char == "e"):
+			return 0xe
+		elif (char == "f"):
+			return 0xf
+		else:
+			return None
+	
 	def convert_hexstring_to_int_list(self, hex_string):
 		out = []
-		for val in hex_string:
-			out.append(int(val, base=16))
-		return out
+		hex_vals = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f"]
 		
+		for val in hex_string:
+			if ((val not in hex_vals) or (val.lower() not in hex_vals)):
+				raise ValueError
+			else:
+				out.append(self.get_hex_object_from_char(val))
+		return out
+	
+	def convert_intlist_to_hexstring(self, list):
+		out = ""
+		for val in list:
+			out = out + str(hex(val))
+		return out
+			
+			
+			
+	def display_clean_hexstring(self, hex_string):
+		return hex_string.replace("0x", "")
+	
+	
 	def create_ciphertext_file(self, file_name, ciphertext):
 		with open(self.ciphertext_folder + str(file_name) + ".txt", 'w')  as f:
 			f.write(str(ciphertext))
@@ -477,13 +530,16 @@ class RSA_sandbox():
 					#Check if we are interpreting the plaintext file as a hex literal string
 					if self.options.check_hex_plaintext():
 						#Obtain the hex literal string from the file and encrypt it to the cipher text
-						self.cipher_text = self.active_encryption_object.encrypt_int_list(self.convert_hexstring_to_int_list(self.plain_text))
+						try:
+							self.cipher_text = self.active_encryption_object.encrypt_int_list(self.convert_hexstring_to_int_list(self.plain_text))
+						except ValueError as e:
+							print("Can not convert file to hex literal! Error: ", str(e))
+							break
 						decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
 						self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", self.convert_string_to_hexlist(str(self.cipher_text)).encode('utf-8'))
-						
-						print("\n\nThe plain text is: ", str(self.convert_string_to_hexlist(self.plain_text)))
-						print("\nThe ciphertext is: ", str(self.convert_string_to_hexlist(str(self.cipher_text))))
-						print("\nDecrypted: ", str(self.convert_string_to_hexlist(self.plain_text)))
+						print("\n\nThe plain text is: ", self.plain_text)
+						print("\nThe ciphertext is: ", self.display_clean_hexstring(self.convert_intlist_to_hexstring(self.cipher_text)))
+						print("\nDecrypted: ", self.display_clean_hexstring(self.convert_intlist_to_hexstring(decrypted)))
 					#Otherwise handle everything as normal ascii lists
 					else:
 						self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
@@ -503,14 +559,28 @@ class RSA_sandbox():
 					except Exception:
 						print("Invalid selection")
 						break
-					self.cipher_text = septuple.encrypt_int_list(get_ascii_list(self.plain_text))
-					decrypted = septuple.decrypt_int_list(self.cipher_text)
-					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(septuple.get_n()) + "," + str(septuple.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
-					
-					print("\n\nThe plain text is: ", self.plain_text)
-					print("\nThe ciphertext is: ", get_string_from_ascii(self.cipher_text))
-					print("\nDecrypted: ", get_string_from_ascii(decrypted))
-					print()
+					if self.options.check_hex_plaintext():
+						#Obtain the hex literal string from the file and encrypt it to the cipher text
+						try:
+							self.cipher_text = self.septuple.encrypt_int_list(self.convert_hexstring_to_int_list(self.plain_text))
+						except ValueError as e:
+							print("Can not convert file to hex literal! Error: ", str(e))
+							break
+						decrypted = self.septuple.decrypt_int_list(self.cipher_text)
+						self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.septuple.get_n()) + "," + str(self.septuple.get_e()) + ")", self.convert_string_to_hexlist(str(self.cipher_text)).encode('utf-8'))
+						
+						print("\n\nThe plain text is: ", self.display_clean_hexstring(self.convert_string_to_hexlist(self.plain_text)))
+						print("\nThe ciphertext is: ", self.display_clean_hexstring(self.convert_string_to_hexlist(str(self.cipher_text))))
+						print("\nDecrypted: ", self.display_clean_hexstring(self.convert_string_to_hexlist(self.plain_text)))
+					#Otherwise handle everything as normal ascii lists
+					else:
+						self.cipher_text = self.septuple.encrypt_int_list(get_ascii_list(self.plain_text))
+						decrypted = self.septuple.decrypt_int_list(self.cipher_text)
+						self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.septuple.get_n()) + "," + str(self.septuple.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
+						
+						print("\n\nThe plain text is: ", self.plain_text)
+						print("\nThe ciphertext is: ", get_string_from_ascii(self.cipher_text))
+						print("\nDecrypted: ", get_string_from_ascii(decrypted))
 					break
 					
 				self.encryption_selection_menu()
