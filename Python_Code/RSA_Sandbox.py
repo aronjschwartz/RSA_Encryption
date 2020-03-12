@@ -185,6 +185,18 @@ class RSA_sandbox():
 		return
 	
 	
+	def convert_string_to_hexlist(self, string):
+		out = ""
+		for val in string:
+			out = out + str(hex(ord(val)))
+		return out
+	
+	def convert_hexstring_to_int_list(self, hex_string):
+		out = []
+		for val in hex_string:
+			out.append(int(val, base=16))
+		return out
+		
 	def create_ciphertext_file(self, file_name, ciphertext):
 		with open(self.ciphertext_folder + str(file_name) + ".txt", 'w')  as f:
 			f.write(str(ciphertext))
@@ -462,13 +474,25 @@ class RSA_sandbox():
 					self.manage_plaintext()
 				choice = input("Use active object? " + str(self.active_encryption_object.get_septuple()) + "? [Y/N]: ")
 				if((choice == "Y") or (choice == "y")):
-					self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
-					decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
-					self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
-					
-					print("\n\nThe plain text is: ", self.plain_text)
-					print("\nThe ciphertext is: ", get_string_from_ascii(self.cipher_text))
-					print("\nDecrypted: ", get_string_from_ascii(decrypted))
+					#Check if we are interpreting the plaintext file as a hex literal string
+					if self.options.check_hex_plaintext():
+						#Obtain the hex literal string from the file and encrypt it to the cipher text
+						self.cipher_text = self.active_encryption_object.encrypt_int_list(self.convert_hexstring_to_int_list(self.plain_text))
+						decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
+						self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", self.convert_string_to_hexlist(str(self.cipher_text)).encode('utf-8'))
+						
+						print("\n\nThe plain text is: ", str(self.convert_string_to_hexlist(self.plain_text)))
+						print("\nThe ciphertext is: ", str(self.convert_string_to_hexlist(str(self.cipher_text))))
+						print("\nDecrypted: ", str(self.convert_string_to_hexlist(self.plain_text)))
+					#Otherwise handle everything as normal ascii lists
+					else:
+						self.cipher_text = self.active_encryption_object.encrypt_int_list(get_ascii_list(self.plain_text))
+						decrypted = self.active_encryption_object.decrypt_int_list(self.cipher_text)
+						self.create_ciphertext_file("cipher_" + str(self.plain_text_file) + "_(" + str(self.active_encryption_object.get_n()) + "," + str(self.active_encryption_object.get_e()) + ")", get_string_from_ascii(self.cipher_text).encode('utf-8'))
+						
+						print("\n\nThe plain text is: ", self.plain_text)
+						print("\nThe ciphertext is: ", get_string_from_ascii(self.cipher_text))
+						print("\nDecrypted: ", get_string_from_ascii(decrypted))
 					print()
 					break
 				else:
@@ -511,9 +535,14 @@ class RSA_sandbox():
 				#Generate the resulting string after decrypting the cipher text list 
 				decrypted_ciphertext_string = get_string_from_ascii(decrypted_cipher_ascii)
 				#Display the original plain text, cipher text, and the decrypted_cipher_text (which should equal the plain text)
-				print("\n\nPlain text: ", plain_text_string)
-				print("\nCipher text: ", cipher_text_string)
-				print("\nDecrypted cipher text: ", decrypted_ciphertext_string)
+				if self.options.check_hex():
+					print("\n\nPlain text: ", str(self.convert_string_to_hexlist(plain_text_string)))
+					print("\nCipher text: ", str(self.convert_string_to_hexlist(cipher_text_string)))
+					print("\nDecrypted cipher text: ", str(self.convert_string_to_hexlist(decrypted_ciphertext_string)))
+				else:
+					print("\n\nPlain text: ", plain_text_string)
+					print("\nCipher text: ", cipher_text_string)
+					print("\nDecrypted cipher text: ", decrypted_ciphertext_string)
 				print()
 		
 				self.encryption_selection_menu()
@@ -1091,13 +1120,21 @@ class RSA_sandbox():
 		self.options.display_options_status()
 		choice = self.selection_prompt()
 		while(1):
+			#Toggle verbose mode
 			if (choice == "1"):
 				self.options.toggle_verbose()
 				system_options_menu()
 				self.options.display_options_status()
 				choice = self.selection_prompt()
+			#Toggle hex display mode
 			elif (choice == "2"):
-				self.options.toggle_hex()
+				self.options.toggle_hex_display()
+				system_options_menu()
+				self.options.display_options_status()
+				choice = self.selection_prompt()
+			#Toggle plaintext hex mode
+			elif (choice == "3"):
+				self.options.toggle_hex_plaintext()
 				system_options_menu()
 				self.options.display_options_status()
 				choice = self.selection_prompt()
@@ -1108,8 +1145,7 @@ class RSA_sandbox():
 				system_options_menu()
 				self.options.display_options_status()
 				choice = self.selection_prompt()
-	def analyze_septuples(self):	
-		print("Analyze septuple selected")
+	
 		
 	def manage_plaintext(self):
 		plaintext_file = self.load_plaintext_select_file()

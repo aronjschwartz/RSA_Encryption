@@ -118,7 +118,8 @@ def key_generation_menu():
 def system_options_menu():
 	print("\n\n******** SYSTEM OPTIONS MENU ********\n")
 	print("1 - Toggle Verbose mode")
-	print("2 - Toggle Hex Mode")
+	print("2 - Toggle Hex Display Mode")
+	print("3 - Toggle Plaintext Hex Mode")
 	print("Q - Return to main menu\n")
 	return 
 
