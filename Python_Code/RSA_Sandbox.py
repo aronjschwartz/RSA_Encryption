@@ -605,7 +605,7 @@ class RSA_sandbox():
 				#Generate the resulting string after decrypting the cipher text list 
 				decrypted_ciphertext_string = get_string_from_ascii(decrypted_cipher_ascii)
 				#Display the original plain text, cipher text, and the decrypted_cipher_text (which should equal the plain text)
-				if self.options.check_hex():
+				if self.options.check_hex_display():
 					print("\n\nPlain text: ", str(self.convert_string_to_hexlist(plain_text_string)))
 					print("\nCipher text: ", str(self.convert_string_to_hexlist(cipher_text_string)))
 					print("\nDecrypted cipher text: ", str(self.convert_string_to_hexlist(decrypted_ciphertext_string)))

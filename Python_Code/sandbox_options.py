@@ -15,8 +15,8 @@ class sandbox_options():
 	#Define the system options as toggleable booleans
 	def __init__(self):
 		self.verbose_output = True
-		self.hex_mode_display = True
-		self.hex_mode_plaintext = True
+		self.hex_mode_display = False
+		self.hex_mode_plaintext = False
 		
 		
 	def check_verbose(self):
